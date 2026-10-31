@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="180dp"
+    android:viewportWidth="360"
+    android:viewportHeight="180">
+    <!-- Deep Cyber Background -->
+    <path android:pathData="M0,0h360v180h-360z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="360"
+                android:endY="180"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#06101E" />
+                <item android:offset="0.5" android:color="#0A1E36" />
+                <item android:offset="1.0" android:color="#051726" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Perspective Grid Lines -->
+    <path
+        android:strokeColor="#1800E5FF"
+        android:strokeWidth="1"
+        android:pathData="M0,36 L360,36 M0,72 L360,72 M0,108 L360,108 M0,144 L360,144 M60,0 L60,180 M120,0 L120,180 M180,0 L180,180 M240,0 L240,180 M300,0 L300,180" />
+    <!-- Radar Concentric Circles -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#2A00E5FF"
+        android:strokeWidth="1.5"
+        android:pathData="M280,90m-70,0a70,70 0,1 1,140 0a70,70 0,1 1,-140 0" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4400E5FF"
+        android:strokeWidth="1.5"
+        android:pathData="M280,90m-46,0a46,46 0,1 1,92 0a46,46 0,1 1,-92 0" />
+    <path
+        android:fillColor="#1500E5FF"
+        android:strokeColor="#8800E5FF"
+        android:strokeWidth="1.5"
+        android:pathData="M280,90m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+    <!-- Topology Connection Lines -->
+    <path
+        android:strokeColor="#6600E676"
+        android:strokeWidth="1.8"
+        android:pathData="M280,90 L238,52 M280,90 L322,58 M280,90 L225,118 M280,90 L315,135" />
+    <!-- Active Nodes -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M280,90m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M238,52m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0" />
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M322,58m-4,0a4,0 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillColor="#FFAB00"
+        android:pathData="M225,118m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M315,135m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+</vector>

@@ -1,0 +1,6 @@
+{
+  "name": "NetPulse Pro",
+  "description": "Scaner profesional de rețea Wi-Fi și LAN în timp real, cu analiză tehnică detaliată a dispozitivelor, alerte de securitate pentru aparate necunoscute, grafice de consum și istoric de conectare securizat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
