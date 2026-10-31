@@ -61,6 +61,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.data.ConnectionEventEntity
 import com.example.data.NetworkProfileInfo
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
@@ -87,6 +88,7 @@ fun SecuredHistoryScreen(
     onClearHistory: () -> Unit,
     onBuildAuditReport: () -> String
 ) {
+    val strings = LocalAppStrings.current
     val context = LocalContext.current
     val sdf = remember { SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault()) }
 
@@ -150,13 +152,13 @@ fun SecuredHistoryScreen(
                             }
                             Column {
                                 Text(
-                                    text = "Jurnal de Conectare Securizat (SHA-256)",
+                                    text = strings.securedLogHeader,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "${events.size} înregistrări semnate criptografic în baza locală Room",
+                                    text = strings.securedLogSub(events.size),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -169,7 +171,7 @@ fun SecuredHistoryScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Blochează Seiful",
+                                contentDescription = "Lock Vault",
                                 tint = AmberAlert
                             )
                         }
@@ -185,10 +187,10 @@ fun SecuredHistoryScreen(
                                 val sendIntent = Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
-                                        putExtra(Intent.EXTRA_SUBJECT, "Raport Audit Rețea NetPulse Pro")
+                                        putExtra(Intent.EXTRA_SUBJECT, "NetPulse Pro Audit Report")
                                         putExtra(Intent.EXTRA_TEXT, reportText)
                                     },
-                                    "Exportă Raportul de Audit"
+                                    strings.exportReportBtn
                                 )
                                 context.startActivity(sendIntent)
                             },
@@ -200,7 +202,7 @@ fun SecuredHistoryScreen(
                         ) {
                             Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Exportă Raport", style = MaterialTheme.typography.labelLarge)
+                            Text(strings.exportReportBtn, style = MaterialTheme.typography.labelLarge)
                         }
 
                         OutlinedButton(
@@ -209,13 +211,13 @@ fun SecuredHistoryScreen(
                         ) {
                             Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Schimbă PIN", style = MaterialTheme.typography.labelLarge)
+                            Text(strings.changePinBtn, style = MaterialTheme.typography.labelLarge)
                         }
 
                         IconButton(onClick = onClearHistory) {
                             Icon(
                                 imageVector = Icons.Default.DeleteSweep,
-                                contentDescription = "Curăță istoricul",
+                                contentDescription = "Clear",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -230,7 +232,7 @@ fun SecuredHistoryScreen(
                             OutlinedTextField(
                                 value = newPinInput,
                                 onValueChange = { if (it.length <= 6) newPinInput = it.filter(Char::isDigit) },
-                                label = { Text("PIN Nou (minim 4 cifre)") },
+                                label = { Text(strings.newPinLabel) },
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                                 modifier = Modifier.weight(1f)
@@ -245,7 +247,7 @@ fun SecuredHistoryScreen(
                                 },
                                 enabled = newPinInput.length >= 4
                             ) {
-                                Text("Salvează")
+                                Text(strings.saveBtn)
                             }
                         }
                     }
@@ -253,7 +255,7 @@ fun SecuredHistoryScreen(
             }
         }
 
-        // 2. Saved Multi-Network Profiles (Acasă / Birou / Călătorie)
+        // 2. Saved Multi-Network Profiles (Home / Office / Travel)
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -277,7 +279,7 @@ fun SecuredHistoryScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = "PROFILURI DE REȚEA SALVATE (ACASĂ / BIROU / TRAVEL)",
+                            text = strings.savedNetworkProfilesHeader,
                             style = MaterialTheme.typography.labelLarge,
                             color = ElectricCyan
                         )
@@ -312,7 +314,7 @@ fun SecuredHistoryScreen(
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
-                                        text = "SSID: ${profile.ssid} (${profile.subnetCidr}) • ${profile.trustedCount} aparate autorizate",
+                                        text = "SSID: ${profile.ssid} (${profile.subnetCidr}) • ${profile.trustedCount} ${strings.authorizedDevicesSuffix}",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -325,7 +327,7 @@ fun SecuredHistoryScreen(
                                 if (isSelected) {
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Activ",
+                                        contentDescription = "Active",
                                         tint = CyberEmerald
                                     )
                                 }
@@ -339,12 +341,12 @@ fun SecuredHistoryScreen(
         // 3. Event Type Filters
         item {
             val filters = listOf(
-                "ALL" to "Toate Evenimentele",
-                "INTRUSION_ALERT" to "Alerte Intruziune",
-                "DEVICE_CONNECTED" to "Conectări Dispozitive",
-                "PORT_VULNERABILITY" to "Audit Porturi",
-                "TRUST_UPDATED" to "Autorizări",
-                "SCAN_AUDIT" to "Scanări Rețea"
+                "ALL" to strings.filterAllEvents,
+                "INTRUSION_ALERT" to strings.filterIntrusionEvents,
+                "DEVICE_CONNECTED" to strings.filterConnectedEvents,
+                "PORT_VULNERABILITY" to strings.filterPortEvents,
+                "TRUST_UPDATED" to strings.filterTrustEvents,
+                "SCAN_AUDIT" to strings.filterScanEvents
             )
             Row(
                 modifier = Modifier
@@ -397,7 +399,7 @@ fun SecuredHistoryScreen(
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = "${event.severity} • ${event.eventType}",
+                                text = "${strings.severityName(event.severity)} • ${event.eventType}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = sevColor,
                                 fontWeight = FontWeight.Bold,
@@ -428,7 +430,7 @@ fun SecuredHistoryScreen(
                             verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             Text(
-                                text = "Nod: ${event.deviceName} | IP: ${event.deviceIp} | MAC: ${event.deviceMac}",
+                                text = "Host: ${event.deviceName} | IP: ${event.deviceIp} | MAC: ${event.deviceMac}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -456,6 +458,7 @@ private fun VaultPinLockGate(
     onUnlockAttempt: (String) -> Boolean,
     onBiometricUnlock: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     var pinInput by remember { mutableStateOf("") }
 
     Box(
@@ -487,21 +490,21 @@ private fun VaultPinLockGate(
                 ) {
                     Icon(
                         imageVector = Icons.Default.EnhancedEncryption,
-                        contentDescription = "Seif Criptat",
+                        contentDescription = strings.vaultPinGateTitle,
                         tint = ElectricCyan,
                         modifier = Modifier.size(34.dp)
                     )
                 }
 
                 Text(
-                    text = "Istoric de Conectare Securizat",
+                    text = strings.vaultPinGateTitle,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "Jurnalul de conectare LAN și amprentele SHA-256 ale aparatelor sunt protejate prin cod PIN sau Autentificare Biometrică pentru a preveni alterarea neautorizată.",
+                    text = strings.vaultPinGateDescription,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -513,7 +516,7 @@ private fun VaultPinLockGate(
                             pinInput = it.filter(Char::isDigit)
                         }
                     },
-                    label = { Text("Introdu Codul PIN (Implicit: $pinHint)") },
+                    label = { Text(strings.enterPinLabel(pinHint)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     singleLine = true,
@@ -545,7 +548,7 @@ private fun VaultPinLockGate(
                     ) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Deblochează", style = MaterialTheme.typography.titleMedium)
+                        Text(strings.unlockBtn, style = MaterialTheme.typography.titleMedium)
                     }
 
                     OutlinedButton(
@@ -578,7 +581,7 @@ private fun VaultPinLockGate(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Autentificare Biometrică / Amprentă",
+                        text = strings.biometricUnlockBtn,
                         style = MaterialTheme.typography.labelLarge,
                         color = CyberEmerald
                     )

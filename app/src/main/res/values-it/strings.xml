@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">NetPulse Pro</string>
+    <string name="nav_radar">Scanner</string>
+    <string name="nav_traffic">Traffico</string>
+    <string name="nav_tools">Strumenti</string>
+    <string name="nav_alerts">Sicurezza</string>
+    <string name="nav_history">Cronologia</string>
+    <string name="scan_action_start">Scansiona Sottorete LAN</string>
+    <string name="scan_action_scanning">Scansione in corso…</string>
+    <string name="unknown_device_alert_title">Avviso: Dispositivi Sconosciuti sul Wi-Fi</string>
+    <string name="vault_locked_title">Cronologia Connessioni Protetta</string>
+    <string name="vault_unlock_button">Sblocca</string>
+    <string name="export_audit_report">Esporta Report</string>
+</resources>

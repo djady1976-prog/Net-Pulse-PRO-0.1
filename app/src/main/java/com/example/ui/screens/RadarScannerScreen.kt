@@ -75,7 +75,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -91,6 +90,7 @@ import com.example.data.NetworkDeviceEntity
 import com.example.data.TrustStatus
 import com.example.data.WifiNetworkSnapshot
 import com.example.ui.DeviceSortOption
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
@@ -119,6 +119,7 @@ fun RadarScannerScreen(
     onDeviceClick: (NetworkDeviceEntity) -> Unit,
     onNavigateToAlerts: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val unknownDevicesCount = allDevices.count { it.trustEnum != TrustStatus.TRUSTED }
     val suspiciousCount = allDevices.count { it.trustEnum == TrustStatus.SUSPICIOUS_FLAGGED }
 
@@ -164,12 +165,12 @@ fun RadarScannerScreen(
                         .fillMaxWidth()
                         .testTag("device_search_input"),
                     placeholder = {
-                        Text("Caută după IP, MAC, producător OUI, OS sau port (ex. 554, Apple)…")
+                        Text(strings.searchPlaceholder)
                     },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Caută dispozitiv",
+                            contentDescription = strings.searchPlaceholder,
                             tint = MaterialTheme.colorScheme.primary
                         )
                     },
@@ -178,7 +179,7 @@ fun RadarScannerScreen(
                             IconButton(onClick = { onSearchQueryChange("") }) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = "Șterge căutarea"
+                                    contentDescription = "Clear"
                                 )
                             }
                         }
@@ -202,14 +203,14 @@ fun RadarScannerScreen(
                     FilterChip(
                         selected = selectedTrustFilter == null,
                         onClick = { onSelectTrustFilter(null) },
-                        label = { Text("Toate (${allDevices.size})") },
+                        label = { Text("${strings.filterAll} (${allDevices.size})") },
                         modifier = Modifier.testTag("filter_all_chip")
                     )
                     FilterChip(
                         selected = selectedTrustFilter == TrustStatus.SUSPICIOUS_FLAGGED,
                         onClick = { onSelectTrustFilter(TrustStatus.SUSPICIOUS_FLAGGED) },
                         label = {
-                            Text("Suspecte (${allDevices.count { it.trustEnum == TrustStatus.SUSPICIOUS_FLAGGED }})")
+                            Text("${strings.filterSuspicious} (${allDevices.count { it.trustEnum == TrustStatus.SUSPICIOUS_FLAGGED }})")
                         },
                         leadingIcon = {
                             Icon(
@@ -225,7 +226,7 @@ fun RadarScannerScreen(
                         selected = selectedTrustFilter == TrustStatus.UNKNOWN_NEW,
                         onClick = { onSelectTrustFilter(TrustStatus.UNKNOWN_NEW) },
                         label = {
-                            Text("Necunoscute (${allDevices.count { it.trustEnum == TrustStatus.UNKNOWN_NEW }})")
+                            Text("${strings.filterUnknown} (${allDevices.count { it.trustEnum == TrustStatus.UNKNOWN_NEW }})")
                         },
                         leadingIcon = {
                             Icon(
@@ -241,7 +242,7 @@ fun RadarScannerScreen(
                         selected = selectedTrustFilter == TrustStatus.TRUSTED,
                         onClick = { onSelectTrustFilter(TrustStatus.TRUSTED) },
                         label = {
-                            Text("De Încredere (${allDevices.count { it.trustEnum == TrustStatus.TRUSTED }})")
+                            Text("${strings.filterTrusted} (${allDevices.count { it.trustEnum == TrustStatus.TRUSTED }})")
                         },
                         leadingIcon = {
                             Icon(
@@ -265,12 +266,12 @@ fun RadarScannerScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
-                        contentDescription = "Sortare",
+                        contentDescription = strings.sortPrefix,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
-                        text = "Ordine:",
+                        text = strings.sortPrefix,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -278,7 +279,12 @@ fun RadarScannerScreen(
                         FilterChip(
                             selected = selectedSortOption == option,
                             onClick = { onSelectSortOption(option) },
-                            label = { Text(option.labelRo, style = MaterialTheme.typography.labelMedium) },
+                            label = {
+                                Text(
+                                    text = strings.sortOptionName(option),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -297,12 +303,12 @@ fun RadarScannerScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "APARATE CONECTATE ÎN TIMP REAL (${filteredDevices.size})",
+                    text = strings.connectedDevicesHeader(filteredDevices.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Apasă pentru inspecție tehnică",
+                    text = strings.tapForTechnicalInspection,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -330,6 +336,7 @@ fun RadarScannerScreen(
 
 @Composable
 fun AboutDeveloperCard(modifier: Modifier = Modifier) {
+    val strings = LocalAppStrings.current
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -383,7 +390,7 @@ fun AboutDeveloperCard(modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Scaner Profesional Wi-Fi & LAN, Audit Securitate și Telemetrie în Timp Real",
+                    text = strings.aboutSubtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -403,6 +410,7 @@ private fun WifiRadarHeroCard(
     onRequestPermissions: () -> Unit,
     onTriggerScan: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val infiniteTransition = rememberInfiniteTransition(label = "radar_sweep")
     val radarAngle by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -428,7 +436,7 @@ private fun WifiRadarHeroCard(
         Box(modifier = Modifier.fillMaxWidth()) {
             Image(
                 painter = painterResource(id = R.drawable.ic_network_radar_hero),
-                contentDescription = "Ilustrație topologie radar rețea",
+                contentDescription = "Network Radar Hero",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(230.dp),
@@ -454,7 +462,7 @@ private fun WifiRadarHeroCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Wifi,
-                                contentDescription = "Wi-Fi Activ",
+                                contentDescription = "Active Wi-Fi",
                                 tint = CyberEmerald,
                                 modifier = Modifier.size(22.dp)
                             )
@@ -483,7 +491,6 @@ private fun WifiRadarHeroCard(
                             val center = Offset(size.width / 2f, size.height / 2f)
                             val maxRadius = size.minDimension / 2f - 4.dp.toPx()
 
-                            // Concentric radar rings
                             drawCircle(
                                 color = ElectricCyan.copy(alpha = 0.22f),
                                 radius = maxRadius,
@@ -503,7 +510,6 @@ private fun WifiRadarHeroCard(
                                 style = Stroke(width = 1.dp.toPx())
                             )
 
-                            // Sweeping Radar Beam
                             val rad = Math.toRadians(radarAngle.toDouble())
                             val beamEnd = Offset(
                                 x = center.x + (maxRadius * cos(rad)).toFloat(),
@@ -521,7 +527,6 @@ private fun WifiRadarHeroCard(
                                 cap = StrokeCap.Round
                             )
 
-                            // Plot discovered devices around the center gateway
                             devices.forEachIndexed { idx, dev ->
                                 if (dev.isGateway) {
                                     drawCircle(
@@ -567,29 +572,29 @@ private fun WifiRadarHeroCard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            TechMetricPill(label = "IP LOCAL", value = wifiSnapshot.localIpv4)
-                            TechMetricPill(label = "GATEWAY", value = wifiSnapshot.gatewayIp)
-                            TechMetricPill(label = "SUBREȚEA", value = wifiSnapshot.subnetCidr)
+                            TechMetricPill(label = strings.localIpLabel, value = wifiSnapshot.localIpv4)
+                            TechMetricPill(label = strings.gatewayLabel, value = wifiSnapshot.gatewayIp)
+                            TechMetricPill(label = strings.subnetLabel, value = wifiSnapshot.subnetCidr)
                         }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             TechMetricPill(
-                                label = "SEMNAL RSSI",
+                                label = strings.signalRssiLabel,
                                 value = "${wifiSnapshot.rssiDbm} dBm (${wifiSnapshot.signalQualityPercent}%)"
                             )
                             TechMetricPill(
-                                label = "VITEZĂ LINK",
+                                label = strings.linkSpeedLabel,
                                 value = "${wifiSnapshot.linkSpeedMbps} Mbps"
                             )
                             TechMetricPill(
-                                label = "INTERFAȚĂ",
+                                label = strings.interfaceLabel,
                                 value = "${wifiSnapshot.interfaceName} • MTU ${wifiSnapshot.mtuSize}"
                             )
                         }
                         Text(
-                            text = "DNS Activ: ${wifiSnapshot.dnsServers} • Criptare: ${wifiSnapshot.securityProtocol}",
+                            text = "${strings.activeDnsPrefix}: ${wifiSnapshot.dnsServers} • ${strings.encryptionPrefix}: ${wifiSnapshot.securityProtocol}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -635,12 +640,12 @@ private fun WifiRadarHeroCard(
                     ) {
                         Icon(
                             imageVector = if (isScanning) Icons.Default.Radar else Icons.Default.Refresh,
-                            contentDescription = "Scanează Rețeaua",
+                            contentDescription = strings.scanNetworkBtn,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isScanning) "Scanare în curs…" else "Scanează Subrețeaua LAN",
+                            text = if (isScanning) strings.scanningInProgressBtn else strings.scanNetworkBtn,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -656,11 +661,11 @@ private fun WifiRadarHeroCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MyLocation,
-                                contentDescription = "Permisiune SSID",
+                                contentDescription = strings.exactSsidBtn,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("SSID Exact", style = MaterialTheme.typography.labelLarge)
+                            Text(strings.exactSsidBtn, style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -692,6 +697,7 @@ private fun IntrusionAlertBanner(
     suspiciousCount: Int,
     onReviewAlerts: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val bannerColor = if (suspiciousCount > 0) CrimsonIntrusion else AmberAlert
     Surface(
         modifier = Modifier
@@ -717,23 +723,23 @@ private fun IntrusionAlertBanner(
             ) {
                 Icon(
                     imageVector = Icons.Default.Security,
-                    contentDescription = "Alertă Securitate",
+                    contentDescription = "Security Alert",
                     tint = bannerColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Alertă: $unknownCount Dispozitive Necunoscute pe Wi-Fi",
+                    text = strings.intrusionBannerTitle(unknownCount),
                     style = MaterialTheme.typography.titleMedium,
                     color = bannerColor,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = if (suspiciousCount > 0) {
-                        "$suspiciousCount aparat prezintă porturi vulnerabile deschise (RTSP/Telnet). Apasă pentru izolare și audit."
+                        strings.intrusionBannerSuspiciousBody(suspiciousCount)
                     } else {
-                        "S-au detectat aparate neautorizate conectate la subrețea. Verifică amprentele MAC și OUI."
+                        strings.intrusionBannerUnknownBody
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
@@ -749,6 +755,7 @@ fun NetworkDeviceTechnicalCard(
     device: NetworkDeviceEntity,
     onClick: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val trustColor = when (device.trustEnum) {
         TrustStatus.TRUSTED -> CyberEmerald
         TrustStatus.UNKNOWN_NEW -> AmberAlert
@@ -776,7 +783,6 @@ fun NetworkDeviceTechnicalCard(
                 .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Top Row: Category Icon, Name + Hostname, Trust Status Badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -795,7 +801,7 @@ fun NetworkDeviceTechnicalCard(
                     ) {
                         Icon(
                             imageVector = categoryIcon(device.categoryEnum),
-                            contentDescription = device.categoryEnum.labelRo,
+                            contentDescription = strings.categoryName(device.categoryEnum),
                             tint = trustColor,
                             modifier = Modifier.size(26.dp)
                         )
@@ -831,7 +837,7 @@ fun NetworkDeviceTechnicalCard(
                                     shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
-                                        text = "TU",
+                                        text = strings.youBadge,
                                         style = MaterialTheme.typography.labelSmall,
                                         color = CyberEmerald,
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -855,7 +861,7 @@ fun NetworkDeviceTechnicalCard(
                     border = androidx.compose.foundation.BorderStroke(0.8.dp, trustColor.copy(alpha = 0.5f))
                 ) {
                     Text(
-                        text = device.trustEnum.labelRo,
+                        text = strings.trustName(device.trustEnum),
                         style = MaterialTheme.typography.labelSmall,
                         color = trustColor,
                         fontWeight = FontWeight.Bold,
@@ -864,7 +870,6 @@ fun NetworkDeviceTechnicalCard(
                 }
             }
 
-            // Middle Row: Monospace IP, MAC, OS, Ping, Signal, Live Speed
             Surface(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
                 shape = RoundedCornerShape(10.dp)
@@ -912,7 +917,6 @@ fun NetworkDeviceTechnicalCard(
                 }
             }
 
-            // Bottom Row: Open Ports Badges + Current Traffic Rate
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -949,7 +953,7 @@ fun NetworkDeviceTechnicalCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Speed,
-                        contentDescription = "Trafic curent",
+                        contentDescription = "Live traffic",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(14.dp)
                     )

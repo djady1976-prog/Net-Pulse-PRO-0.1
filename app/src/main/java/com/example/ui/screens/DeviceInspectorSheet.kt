@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.NetworkDeviceEntity
 import com.example.data.PingDiagnosticResult
 import com.example.data.TrustStatus
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
@@ -79,6 +80,7 @@ fun DeviceInspectorSheet(
     onStartPing: () -> Unit,
     onSendWakeOnLan: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isEditingIdentity by remember(device.macAddress) { mutableStateOf(false) }
     var aliasInput by remember(device.macAddress, device.customAlias) { mutableStateOf(device.customAlias) }
@@ -125,7 +127,7 @@ fun DeviceInspectorSheet(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "${device.categoryEnum.labelRo} • ${device.vendorOui}",
+                            text = "${strings.categoryName(device.categoryEnum)} • ${device.vendorOui}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -134,14 +136,14 @@ fun DeviceInspectorSheet(
                 IconButton(onClick = { isEditingIdentity = !isEditingIdentity }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editează eticheta dispozitivului",
+                        contentDescription = strings.editIdentityTitle,
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Închide inspectorul"
+                        contentDescription = "Close"
                     )
                 }
             }
@@ -159,28 +161,28 @@ fun DeviceInspectorSheet(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = "Personalizare Identitate & Locație",
+                            text = strings.editIdentityTitle,
                             style = MaterialTheme.typography.titleMedium,
                             color = ElectricCyan
                         )
                         OutlinedTextField(
                             value = aliasInput,
                             onValueChange = { aliasInput = it },
-                            label = { Text("Denumire Dispozitiv (Alias)") },
+                            label = { Text(strings.aliasLabel) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
                             value = roomInput,
                             onValueChange = { roomInput = it },
-                            label = { Text("Cameră / Zonă Fizică") },
+                            label = { Text(strings.roomZoneLabel) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
                             value = notesInput,
                             onValueChange = { notesInput = it },
-                            label = { Text("Note Tehnice / Observații Audit") },
+                            label = { Text(strings.technicalNotesLabel) },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Button(
@@ -192,7 +194,7 @@ fun DeviceInspectorSheet(
                         ) {
                             Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Salvează")
+                            Text(strings.saveBtn)
                         }
                     }
                 }
@@ -201,7 +203,7 @@ fun DeviceInspectorSheet(
             // Trust Status Selector + Watchdog Toggle
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "STATUT DE SECURITATE ȘI AUTORIZARE REȚEA",
+                    text = strings.securityAuthSectionTitle,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -219,7 +221,7 @@ fun DeviceInspectorSheet(
                         FilterChip(
                             selected = selected,
                             onClick = { onUpdateTrust(status) },
-                            label = { Text(status.labelRo, style = MaterialTheme.typography.labelMedium) },
+                            label = { Text(strings.trustName(status), style = MaterialTheme.typography.labelMedium) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = when (status) {
@@ -259,12 +261,12 @@ fun DeviceInspectorSheet(
                             )
                             Column {
                                 Text(
-                                    text = "Watchdog 24/7 Uptime (${"%.2f".format(device.uptimePercent)}%)",
+                                    text = strings.watchdogUptimeTitle("%.2f".format(device.uptimePercent)),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "Alertă la deconectarea echipamentului din LAN",
+                                    text = strings.watchdogUptimeSubtitle,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -290,27 +292,27 @@ fun DeviceInspectorSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "FIȘĂ TEHNICĂ COMPLETĂ HARDWARE & REȚEA",
+                        text = strings.fullHardwareSpecHeader,
                         style = MaterialTheme.typography.labelLarge,
                         color = ElectricCyan
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-                    SpecRow("Adresă IPv4", device.ipAddress)
-                    SpecRow("Adresă IPv6 Locală", device.ipv6Address)
-                    SpecRow("Adresă Fizică MAC", device.macAddress)
-                    SpecRow("Producător OUI IEEE", device.vendorOui)
-                    SpecRow("Hostname Rețea (rDNS)", device.hostname)
-                    SpecRow("Amprentă Sistem Operare", device.osFingerprint)
-                    SpecRow("Alocare IP / DHCP", device.dhcpType)
-                    SpecRow("Banda & Viteză Link", "${device.frequencyBand} • ${device.linkSpeedMbps} Mbps")
-                    SpecRow("Putere Semnal & Ping", "${device.signalRssiDbm} dBm • Latență ${device.latencyMs} ms (TTL ${device.ttl})")
-                    SpecRow("Servicii mDNS / Bonjour", device.mdnsServices)
+                    SpecRow(strings.specIpv4, device.ipAddress)
+                    SpecRow(strings.specIpv6, device.ipv6Address)
+                    SpecRow(strings.specMac, device.macAddress)
+                    SpecRow(strings.specVendorOui, device.vendorOui)
+                    SpecRow(strings.specHostname, device.hostname)
+                    SpecRow(strings.specOsFingerprint, device.osFingerprint)
+                    SpecRow(strings.specDhcpType, device.dhcpType)
+                    SpecRow(strings.specBandSpeed, "${device.frequencyBand} • ${device.linkSpeedMbps} Mbps")
+                    SpecRow(strings.specSignalPing, "${device.signalRssiDbm} dBm • ${device.latencyMs} ms (TTL ${device.ttl})")
+                    SpecRow(strings.specMdns, device.mdnsServices)
                     SpecRow(
-                        "Trafic Curent & Total",
-                        "↓ ${device.currentDownloadKbps.toInt()} KB/s | ↑ ${device.currentUploadKbps.toInt()} KB/s • Total: ${"%.1f".format(device.sessionTrafficMb)} MB"
+                        strings.specCurrentTraffic,
+                        "↓ ${device.currentDownloadKbps.toInt()} KB/s | ↑ ${device.currentUploadKbps.toInt()} KB/s • ${"%.1f".format(device.sessionTrafficMb)} MB"
                     )
-                    SpecRow("Prima Detectare", sdf.format(Date(device.firstSeenEpochMs)))
-                    SpecRow("Ultima Activitate", sdf.format(Date(device.lastSeenEpochMs)))
+                    SpecRow(strings.specFirstSeen, sdf.format(Date(device.firstSeenEpochMs)))
+                    SpecRow(strings.specLastSeen, sdf.format(Date(device.lastSeenEpochMs)))
                 }
             }
 
@@ -330,14 +332,14 @@ fun DeviceInspectorSheet(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "PORTURI TCP/UDP DESCHISE (${device.parsedPorts.size})",
+                                text = strings.openPortsHeader(device.parsedPorts.size),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = ElectricCyan
                             )
                             Text(
-                                text = "Servicii expuse și bannere de protocol detectate",
+                                text = strings.openPortsSubtitle,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -349,7 +351,7 @@ fun DeviceInspectorSheet(
                         ) {
                             Icon(Icons.Default.Security, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(if (isPortAuditRunning) "Audit…" else "Re-scanează")
+                            Text(if (isPortAuditRunning) strings.auditingBtn else strings.rescanBtn)
                         }
                     }
 
@@ -395,7 +397,7 @@ fun DeviceInspectorSheet(
                                 shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
-                                    text = "RISC ${portInfo.riskLevel}",
+                                    text = "${strings.riskPrefix} ${strings.riskLevelName(portInfo.riskLevel)}",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = riskColor,
                                     fontWeight = FontWeight.Bold,
@@ -425,7 +427,7 @@ fun DeviceInspectorSheet(
                 ) {
                     Icon(Icons.Default.NetworkPing, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Test Ping & Jitter", style = MaterialTheme.typography.labelLarge)
+                    Text(strings.pingJitterBtn, style = MaterialTheme.typography.labelLarge)
                 }
 
                 OutlinedButton(
@@ -438,7 +440,7 @@ fun DeviceInspectorSheet(
                 ) {
                     Icon(Icons.Default.PowerSettingsNew, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Wake-on-LAN", style = MaterialTheme.typography.labelLarge)
+                    Text(strings.wakeOnLanBtn, style = MaterialTheme.typography.labelLarge)
                 }
             }
 
@@ -468,7 +470,7 @@ fun DeviceInspectorSheet(
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
-                                text = "TELEMETRIE ICMP PING (${pingResult.targetIp})",
+                                text = "${strings.icmpPingTelemetryTitle} (${pingResult.targetIp})",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = CyberEmerald
                             )
@@ -482,9 +484,9 @@ fun DeviceInspectorSheet(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("MIN: ${pingResult.minMs} ms", style = MaterialTheme.typography.labelMedium, color = CyberEmerald)
-                            Text("MEDIE: ${pingResult.avgMs} ms", style = MaterialTheme.typography.labelMedium, color = ElectricCyan)
-                            Text("MAX: ${pingResult.maxMs} ms", style = MaterialTheme.typography.labelMedium, color = AmberAlert)
+                            Text("${strings.minLabel}: ${pingResult.minMs} ms", style = MaterialTheme.typography.labelMedium, color = CyberEmerald)
+                            Text("${strings.avgLabel}: ${pingResult.avgMs} ms", style = MaterialTheme.typography.labelMedium, color = ElectricCyan)
+                            Text("${strings.maxLabel}: ${pingResult.maxMs} ms", style = MaterialTheme.typography.labelMedium, color = AmberAlert)
                             Text("JITTER: ${pingResult.jitterMs} ms", style = MaterialTheme.typography.labelMedium)
                         }
                         FlowRow(

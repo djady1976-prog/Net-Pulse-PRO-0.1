@@ -5,10 +5,10 @@
     <string name="nav_tools">Unelte Pro</string>
     <string name="nav_alerts">Securitate</string>
     <string name="nav_history">Istoric</string>
-    <string name="scan_action_start">Scanează Rețeaua</string>
-    <string name="scan_action_scanning">Scanare Subrețea Activă…</string>
-    <string name="unknown_device_alert_title">Alertă: Dispozitive Necunoscute Detectate</string>
-    <string name="vault_locked_title">Jurnal de Conectare Criptat</string>
-    <string name="vault_unlock_button">Deblochează Istoricul</string>
-    <string name="export_audit_report">Exportă Raport Audit</string>
+    <string name="scan_action_start">Scanează Subrețeaua LAN</string>
+    <string name="scan_action_scanning">Scanare în curs…</string>
+    <string name="unknown_device_alert_title">Alertă: Dispozitive Necunoscute pe Wi-Fi</string>
+    <string name="vault_locked_title">Istoric de Conectare Securizat</string>
+    <string name="vault_unlock_button">Deblochează</string>
+    <string name="export_audit_report">Exportă Raport</string>
 </resources>

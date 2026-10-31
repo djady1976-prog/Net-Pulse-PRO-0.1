@@ -25,9 +25,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Build
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EnhancedEncryption
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Refresh
@@ -47,6 +49,7 @@ import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,6 +67,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,6 +90,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.data.TrustStatus
 import com.example.ui.NetPulseViewModel
+import com.example.ui.i18n.AppLanguage
+import com.example.ui.i18n.LocalAppLanguage
+import com.example.ui.i18n.LocalAppStrings
+import com.example.ui.i18n.toAppStrings
+import com.example.ui.screens.AboutDeveloperCard
 import com.example.ui.screens.DeviceInspectorSheet
 import com.example.ui.screens.ProToolsScreen
 import com.example.ui.screens.RadarScannerScreen
@@ -95,20 +104,18 @@ import com.example.ui.screens.TrafficChartsScreen
 import com.example.ui.theme.AppThemePreset
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
-import com.example.ui.theme.ElectricCyan
 import com.example.ui.theme.NetPulseProTheme
 
 enum class NetPulseTab(
-    val titleRes: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     val testTagId: String
 ) {
-    RADAR(R.string.nav_radar, Icons.Filled.Radar, Icons.Outlined.Radar, "nav_tab_radar"),
-    TRAFFIC(R.string.nav_traffic, Icons.Filled.BarChart, Icons.Outlined.BarChart, "nav_tab_traffic"),
-    TOOLS(R.string.nav_tools, Icons.Filled.Build, Icons.Outlined.Build, "nav_tab_tools"),
-    ALERTS(R.string.nav_alerts, Icons.Filled.Shield, Icons.Outlined.Shield, "nav_tab_alerts"),
-    HISTORY(R.string.nav_history, Icons.Filled.EnhancedEncryption, Icons.Outlined.EnhancedEncryption, "nav_tab_history")
+    RADAR(Icons.Filled.Radar, Icons.Outlined.Radar, "nav_tab_radar"),
+    TRAFFIC(Icons.Filled.BarChart, Icons.Outlined.BarChart, "nav_tab_traffic"),
+    TOOLS(Icons.Filled.Build, Icons.Outlined.Build, "nav_tab_tools"),
+    ALERTS(Icons.Filled.Shield, Icons.Outlined.Shield, "nav_tab_alerts"),
+    HISTORY(Icons.Filled.EnhancedEncryption, Icons.Outlined.EnhancedEncryption, "nav_tab_history")
 }
 
 class MainActivity : ComponentActivity() {
@@ -119,7 +126,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Configure display cutout & always start in full-screen immersive mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes = window.attributes.apply {
                 layoutInDisplayCutoutMode =
@@ -133,8 +139,13 @@ class MainActivity : ComponentActivity() {
         val initialPreset = AppThemePreset.entries.firstOrNull { it.id == savedThemeId }
             ?: AppThemePreset.CYBER_DARK
 
+        val savedLangCode = prefs.getString("selected_language", AppLanguage.RO.code)
+        val initialLang = AppLanguage.entries.firstOrNull { it.code == savedLangCode }
+            ?: AppLanguage.RO
+
         setContent {
             var currentThemePreset by rememberSaveable { mutableStateOf(initialPreset) }
+            var currentLanguage by rememberSaveable { mutableStateOf(initialLang) }
             var fullScreenState by rememberSaveable { mutableStateOf(true) }
 
             LaunchedEffect(fullScreenState) {
@@ -142,19 +153,29 @@ class MainActivity : ComponentActivity() {
                 applyImmersiveFullScreen(fullScreenState)
             }
 
-            NetPulseProTheme(themePreset = currentThemePreset) {
-                NetPulseApp(
-                    currentThemePreset = currentThemePreset,
-                    isFullScreen = fullScreenState,
-                    onSelectThemePreset = { newPreset ->
-                        currentThemePreset = newPreset
-                        prefs.edit().putString("selected_theme", newPreset.id).apply()
-                    },
-                    onToggleFullScreen = { enabled ->
-                        fullScreenState = enabled
-                        applyImmersiveFullScreen(enabled)
-                    }
-                )
+            CompositionLocalProvider(
+                LocalAppStrings provides currentLanguage.toAppStrings(),
+                LocalAppLanguage provides currentLanguage
+            ) {
+                NetPulseProTheme(themePreset = currentThemePreset) {
+                    NetPulseApp(
+                        currentThemePreset = currentThemePreset,
+                        currentLanguage = currentLanguage,
+                        isFullScreen = fullScreenState,
+                        onSelectThemePreset = { newPreset ->
+                            currentThemePreset = newPreset
+                            prefs.edit().putString("selected_theme", newPreset.id).apply()
+                        },
+                        onSelectLanguage = { newLang ->
+                            currentLanguage = newLang
+                            prefs.edit().putString("selected_language", newLang.code).apply()
+                        },
+                        onToggleFullScreen = { enabled ->
+                            fullScreenState = enabled
+                            applyImmersiveFullScreen(enabled)
+                        }
+                    )
+                }
             }
         }
     }
@@ -183,11 +204,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NetPulseApp(
     currentThemePreset: AppThemePreset = AppThemePreset.CYBER_DARK,
+    currentLanguage: AppLanguage = AppLanguage.RO,
     isFullScreen: Boolean = true,
     onSelectThemePreset: (AppThemePreset) -> Unit = {},
+    onSelectLanguage: (AppLanguage) -> Unit = {},
     onToggleFullScreen: (Boolean) -> Unit = {},
     viewModel: NetPulseViewModel = viewModel()
 ) {
+    val strings = LocalAppStrings.current
     val context = LocalContext.current
     var currentTab by rememberSaveable { mutableStateOf(NetPulseTab.RADAR) }
     var showThemePickerSheet by rememberSaveable { mutableStateOf(false) }
@@ -207,7 +231,6 @@ fun NetPulseApp(
     val isPortAuditRunning by viewModel.isPortAuditRunning.collectAsStateWithLifecycle()
     val bannerMessage by viewModel.actionBannerMessage.collectAsStateWithLifecycle()
 
-    // Pro Tools states
     val dualSpeedTestResult by viewModel.dualSpeedTestResult.collectAsStateWithLifecycle()
     val signalHeatmapPoints by viewModel.signalHeatmapPoints.collectAsStateWithLifecycle()
     val tracerouteTarget by viewModel.tracerouteTarget.collectAsStateWithLifecycle()
@@ -218,7 +241,6 @@ fun NetPulseApp(
     val isDnsBenchmarkRunning by viewModel.isDnsBenchmarkRunning.collectAsStateWithLifecycle()
     val subnetCalcResult by viewModel.subnetCalcResult.collectAsStateWithLifecycle()
 
-    // Security & History states
     val routerArpAudit by viewModel.routerArpAudit.collectAsStateWithLifecycle()
     val alertOnUnknown by viewModel.alertOnUnknownDevices.collectAsStateWithLifecycle()
     val alertOnPorts by viewModel.alertOnVulnerablePorts.collectAsStateWithLifecycle()
@@ -264,12 +286,19 @@ fun NetPulseApp(
         }
     }
 
-    // Handle system Back press on secondary screens
     BackHandler(enabled = currentTab != NetPulseTab.RADAR) {
         currentTab = NetPulseTab.RADAR
     }
 
     val unknownCount = allDevices.count { it.trustEnum != TrustStatus.TRUSTED }
+
+    fun tabTitle(tab: NetPulseTab): String = when (tab) {
+        NetPulseTab.RADAR -> strings.navRadar
+        NetPulseTab.TRAFFIC -> strings.navTraffic
+        NetPulseTab.TOOLS -> strings.navTools
+        NetPulseTab.ALERTS -> strings.navAlerts
+        NetPulseTab.HISTORY -> strings.navHistory
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -296,7 +325,7 @@ fun NetPulseApp(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "${allDevices.size} noduri • ${wifiSnapshot.subnetCidr}",
+                                text = "${allDevices.size} ${strings.nodesCountLabel} • ${wifiSnapshot.subnetCidr}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -312,7 +341,7 @@ fun NetPulseApp(
                             modifier = Modifier.padding(end = 2.dp)
                         ) {
                             Text(
-                                text = "$unknownCount ALERTE",
+                                text = "$unknownCount ${strings.alertsBadgeSuffix}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = CrimsonIntrusion,
                                 fontWeight = FontWeight.Bold,
@@ -320,13 +349,33 @@ fun NetPulseApp(
                             )
                         }
                     }
+                    // Quick 1-Tap Language Cycle / Selector Badge (RO / EN / IT / DE)
+                    Surface(
+                        onClick = {
+                            val nextIdx = (AppLanguage.entries.indexOf(currentLanguage) + 1) % AppLanguage.entries.size
+                            onSelectLanguage(AppLanguage.entries[nextIdx])
+                        },
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp)
+                            .testTag("top_language_cycle_button")
+                    ) {
+                        Text(
+                            text = currentLanguage.badgeCode,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                        )
+                    }
                     IconButton(
                         onClick = { viewModel.triggerNetworkScan() },
                         modifier = Modifier.testTag("top_rescan_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Re-scanează Rețeaua",
+                            contentDescription = strings.scanNetworkBtn,
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -336,7 +385,7 @@ fun NetPulseApp(
                     ) {
                         Icon(
                             imageVector = if (isFullScreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
-                            contentDescription = "Comută Modul Full Screen",
+                            contentDescription = "Full Screen",
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -346,7 +395,7 @@ fun NetPulseApp(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Palette,
-                            contentDescription = "Selector Teme Vizuale",
+                            contentDescription = strings.themeAndDisplaySheetTitle,
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -362,6 +411,7 @@ fun NetPulseApp(
             ) {
                 NetPulseTab.entries.forEach { tab ->
                     val selected = currentTab == tab
+                    val labelText = tabTitle(tab)
                     NavigationBarItem(
                         selected = selected,
                         onClick = { currentTab = tab },
@@ -377,19 +427,19 @@ fun NetPulseApp(
                                 ) {
                                     Icon(
                                         imageVector = if (selected) tab.selectedIcon else tab.unselectedIcon,
-                                        contentDescription = stringResource(tab.titleRes)
+                                        contentDescription = labelText
                                     )
                                 }
                             } else {
                                 Icon(
                                     imageVector = if (selected) tab.selectedIcon else tab.unselectedIcon,
-                                    contentDescription = stringResource(tab.titleRes)
+                                    contentDescription = labelText
                                 )
                             }
                         },
                         label = {
                             Text(
-                                text = stringResource(tab.titleRes),
+                                text = labelText,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -475,14 +525,14 @@ fun NetPulseApp(
                         viewModel.updateDeviceTrust(
                             dev,
                             TrustStatus.TRUSTED,
-                            "Autorizat manual de administratorul rețelei."
+                            "Authorized by network administrator."
                         )
                     },
                     onFlagDeviceSuspicious = { dev ->
                         viewModel.updateDeviceTrust(
                             dev,
                             TrustStatus.SUSPICIOUS_FLAGGED,
-                            "Izolat în carantină ca dispozitiv suspect."
+                            "Isolated in quarantine as suspicious device."
                         )
                     },
                     onToggleWatchdog = { dev, enabled ->
@@ -522,7 +572,6 @@ fun NetPulseApp(
                 )
             }
 
-            // Full Technical Device Inspector BottomSheet
             selectedDevice?.let { activeDevice ->
                 DeviceInspectorSheet(
                     device = activeDevice,
@@ -544,14 +593,13 @@ fun NetPulseApp(
                 )
             }
 
-            // Visual Theme & Full-Screen Selector Sheet
             if (showThemePickerSheet) {
                 ThemeAndDisplayPickerSheet(
                     currentPreset = currentThemePreset,
+                    currentLanguage = currentLanguage,
                     isFullScreen = isFullScreen,
-                    onSelectPreset = { preset ->
-                        onSelectThemePreset(preset)
-                    },
+                    onSelectPreset = onSelectThemePreset,
+                    onSelectLanguage = onSelectLanguage,
                     onToggleFullScreen = onToggleFullScreen,
                     onDismiss = { showThemePickerSheet = false }
                 )
@@ -564,11 +612,14 @@ fun NetPulseApp(
 @Composable
 private fun ThemeAndDisplayPickerSheet(
     currentPreset: AppThemePreset,
+    currentLanguage: AppLanguage,
     isFullScreen: Boolean,
     onSelectPreset: (AppThemePreset) -> Unit,
+    onSelectLanguage: (AppLanguage) -> Unit,
     onToggleFullScreen: (Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -579,6 +630,7 @@ private fun ThemeAndDisplayPickerSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 10.dp)
                 .testTag("theme_picker_sheet"),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -595,19 +647,58 @@ private fun ThemeAndDisplayPickerSheet(
                 )
                 Column {
                     Text(
-                        text = "Teme Vizuale & Afișare Full Screen",
+                        text = strings.themeAndDisplaySheetTitle,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Personalizează paleta cromatică a consolei NetPulse Pro",
+                        text = strings.themeAndDisplaySheetSub,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Immersive Full-Screen Mode Card
+            // 1. Language Selector Section (Română, English, Italiano, Deutsch)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Language,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = strings.languageSelectorHeader,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppLanguage.entries.forEach { lang ->
+                    val selected = lang == currentLanguage
+                    FilterChip(
+                        selected = selected,
+                        onClick = { onSelectLanguage(lang) },
+                        label = {
+                            Text(
+                                text = "${lang.badgeCode} • ${lang.nativeName}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        modifier = Modifier.testTag("lang_chip_${lang.code}")
+                    )
+                }
+            }
+
+            // 2. Immersive Full-Screen Mode Card
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(14.dp)
@@ -631,12 +722,12 @@ private fun ThemeAndDisplayPickerSheet(
                         )
                         Column {
                             Text(
-                                text = "Mod Imersiv Full Screen la Pornire",
+                                text = strings.immersiveFullScreenTitle,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Ascunde automat barele de sistem pentru spațiu maxim de telemetrie",
+                                text = strings.immersiveFullScreenSub,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -652,13 +743,14 @@ private fun ThemeAndDisplayPickerSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
 
             Text(
-                text = "ALEGE TEMA INTERFEȚEI (6 PALETE DISPONIBILE)",
+                text = strings.chooseThemeHeader,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
             )
 
             AppThemePreset.entries.forEach { preset ->
                 val isSelected = preset == currentPreset
+                val (presetTitle, presetSub) = strings.themePresetTitles(preset)
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -683,7 +775,6 @@ private fun ThemeAndDisplayPickerSheet(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            // Color Swatch Preview
                             Box(
                                 modifier = Modifier
                                     .size(42.dp)
@@ -707,13 +798,13 @@ private fun ThemeAndDisplayPickerSheet(
 
                             Column {
                                 Text(
-                                    text = preset.titleRo,
+                                    text = presetTitle,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = preset.subtitleRo,
+                                    text = presetSub,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -723,7 +814,7 @@ private fun ThemeAndDisplayPickerSheet(
                         if (isSelected) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
-                                contentDescription = "Temă Activă",
+                                contentDescription = "Active Theme",
                                 tint = preset.previewPrimary,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -734,7 +825,7 @@ private fun ThemeAndDisplayPickerSheet(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
 
-            com.example.ui.screens.AboutDeveloperCard()
+            AboutDeveloperCard()
 
             Spacer(modifier = Modifier.height(20.dp))
         }

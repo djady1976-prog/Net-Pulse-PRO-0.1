@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -53,6 +52,7 @@ import com.example.data.ProtocolShare
 import com.example.data.TrafficSample
 import com.example.data.TrustStatus
 import com.example.data.WifiNetworkSnapshot
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
@@ -67,6 +67,7 @@ fun TrafficChartsScreen(
     wifiSnapshot: WifiNetworkSnapshot,
     onDeviceClick: (NetworkDeviceEntity) -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val latest = trafficHistory.lastOrNull()
     val currentDownMbps = (latest?.downloadKbps ?: 1450f) / 1000f * 8f
     val currentUpMbps = (latest?.uploadKbps ?: 420f) / 1000f * 8f
@@ -91,15 +92,15 @@ fun TrafficChartsScreen(
             ) {
                 ThroughputKpiCard(
                     modifier = Modifier.weight(1f),
-                    title = "DOWNLOAD LIVE",
+                    title = strings.liveDownloadTitle,
                     value = "${"%.1f".format(currentDownMbps)} Mbps",
-                    subtitle = "${(latest?.downloadKbps ?: 0f).toInt()} KB/s • Vârf ${"%.1f".format(peakDownMbps)} Mbps",
+                    subtitle = "${(latest?.downloadKbps ?: 0f).toInt()} KB/s • ${strings.peakPrefix} ${"%.1f".format(peakDownMbps)} Mbps",
                     accentColor = ElectricCyan,
                     icon = Icons.Default.ArrowDownward
                 )
                 ThroughputKpiCard(
                     modifier = Modifier.weight(1f),
-                    title = "UPLOAD LIVE",
+                    title = strings.liveUploadTitle,
                     value = "${"%.1f".format(currentUpMbps)} Mbps",
                     subtitle = "${(latest?.uploadKbps ?: 0f).toInt()} KB/s • ${latest?.packetsPerSec ?: 420} pkt/s",
                     accentColor = CyberEmerald,
@@ -132,14 +133,14 @@ fun TrafficChartsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "FLUX TRAFIC SUBREȚEA ÎN TIMP REAL",
+                                text = strings.realtimeSubnetTrafficHeader,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = ElectricCyan
                             )
                             Text(
-                                text = "Monitorizare continuă pachete RX/TX (TrafficStats + Sonde LAN)",
+                                text = strings.realtimeSubnetTrafficSub,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -149,7 +150,7 @@ fun TrafficChartsScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "Total: ${"%.2f".format(totalSessionGb)} GB",
+                                text = "${strings.sessionTotalPrefix}: ${"%.2f".format(totalSessionGb)} GB",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = CyberEmerald,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -157,16 +158,14 @@ fun TrafficChartsScreen(
                         }
                     }
 
-                    // Legend
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        LegendIndicator(color = ElectricCyan, label = "Download (RX KB/s)")
-                        LegendIndicator(color = CyberEmerald, label = "Upload (TX KB/s)")
+                        LegendIndicator(color = ElectricCyan, label = strings.downloadLegend)
+                        LegendIndicator(color = CyberEmerald, label = strings.uploadLegend)
                     }
 
-                    // Custom Canvas Area Chart
                     LiveTrafficAreaCanvas(
                         samples = trafficHistory,
                         modifier = Modifier
@@ -201,7 +200,7 @@ fun TrafficChartsScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = "DISTRIBUȚIE CONSUM PE PROTOCOALE & SERVICII",
+                            text = strings.protocolDistributionHeader,
                             style = MaterialTheme.typography.labelLarge,
                             color = ElectricCyan
                         )
@@ -251,7 +250,7 @@ fun TrafficChartsScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "Sesiune",
+                                    text = strings.sessionLabel,
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -335,12 +334,12 @@ fun TrafficChartsScreen(
                         )
                         Column {
                             Text(
-                                text = "ANALIZĂ SPECTRU RADIO & CONGESTIE CANAL WI-FI",
+                                text = strings.wifiSpectrumHeader,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = CyberEmerald
                             )
                             Text(
-                                text = "${wifiSnapshot.ssid} pe Canalul ${wifiSnapshot.channelNumber} (${wifiSnapshot.frequencyMHz} MHz) • ${wifiSnapshot.rssiDbm} dBm",
+                                text = "${wifiSnapshot.ssid} • ${strings.channelWord} ${wifiSnapshot.channelNumber} (${wifiSnapshot.frequencyMHz} MHz) • ${wifiSnapshot.rssiDbm} dBm",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -370,7 +369,7 @@ fun TrafficChartsScreen(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "CLASAMENT CONSUM TRAFIC PE DISPOZITIVE",
+                    text = strings.deviceBandwidthRankingHeader,
                     style = MaterialTheme.typography.labelLarge,
                     color = ElectricCyan
                 )
@@ -534,7 +533,6 @@ private fun LiveTrafficAreaCanvas(
         val padBottom = 12.dp.toPx()
         val chartHeight = h - padBottom
 
-        // Horizontal reference grid lines
         for (i in 0..3) {
             val y = chartHeight * (i / 3f)
             drawLine(
@@ -653,10 +651,8 @@ private fun WifiSpectrumCurveCanvas(
         }
 
         val activeHeight = ((activeRssi + 100) / 70f).coerceIn(0.45f, 0.92f)
-        // Neighbouring channels (low interference)
         drawChannelBell(0.22f, 0.16f, 0.42f, AmberAlert)
         drawChannelBell(0.78f, 0.15f, 0.36f, VioletSpectrum)
-        // Primary active Wi-Fi 6 channel
         drawChannelBell(0.52f, 0.22f, activeHeight, CyberEmerald)
     }
 }

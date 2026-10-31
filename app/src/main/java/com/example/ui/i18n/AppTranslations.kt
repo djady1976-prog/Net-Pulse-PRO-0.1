@@ -1,0 +1,1041 @@
+package com.example.ui.i18n
+
+import androidx.compose.runtime.staticCompositionLocalOf
+import com.example.data.DeviceCategory
+import com.example.data.TrustStatus
+import com.example.ui.DeviceSortOption
+import com.example.ui.theme.AppThemePreset
+
+enum class AppLanguage(
+    val code: String,
+    val nativeName: String,
+    val subtitle: String,
+    val badgeCode: String
+) {
+    RO("ro", "Română", "Limba implicită • Termeni tehnici RO", "RO"),
+    EN("en", "English", "International Network & Security English", "EN"),
+    IT("it", "Italiano", "Terminologia tecnica di rete in italiano", "IT"),
+    DE("de", "Deutsch", "Netzwerk- und Sicherheitsterminologie (DE)", "DE")
+}
+
+data class AppStrings(
+    // Navigation & Top Bar
+    val navRadar: String,
+    val navTraffic: String,
+    val navTools: String,
+    val navAlerts: String,
+    val navHistory: String,
+    val nodesCountLabel: String, // e.g. "noduri" / "nodes" / "nodi" / "Knoten"
+    val alertsBadgeSuffix: String, // "ALERTE" / "ALERTS" / "AVVISI" / "WARNUNGEN"
+
+    // Radar Scanner Screen
+    val localIpLabel: String,
+    val gatewayLabel: String,
+    val subnetLabel: String,
+    val signalRssiLabel: String,
+    val linkSpeedLabel: String,
+    val interfaceLabel: String,
+    val activeDnsPrefix: String,
+    val encryptionPrefix: String,
+    val scanNetworkBtn: String,
+    val scanningInProgressBtn: String,
+    val exactSsidBtn: String,
+    val intrusionBannerTitle: (Int) -> String,
+    val intrusionBannerSuspiciousBody: (Int) -> String,
+    val intrusionBannerUnknownBody: String,
+    val searchPlaceholder: String,
+    val filterAll: String,
+    val filterSuspicious: String,
+    val filterUnknown: String,
+    val filterTrusted: String,
+    val sortPrefix: String,
+    val connectedDevicesHeader: (Int) -> String,
+    val tapForTechnicalInspection: String,
+    val youBadge: String,
+    val aboutSubtitle: String,
+
+    // Device Inspector Sheet
+    val editIdentityTitle: String,
+    val aliasLabel: String,
+    val roomZoneLabel: String,
+    val technicalNotesLabel: String,
+    val saveBtn: String,
+    val securityAuthSectionTitle: String,
+    val watchdogUptimeTitle: (String) -> String,
+    val watchdogUptimeSubtitle: String,
+    val fullHardwareSpecHeader: String,
+    val specIpv4: String,
+    val specIpv6: String,
+    val specMac: String,
+    val specVendorOui: String,
+    val specHostname: String,
+    val specOsFingerprint: String,
+    val specDhcpType: String,
+    val specBandSpeed: String,
+    val specSignalPing: String,
+    val specMdns: String,
+    val specCurrentTraffic: String,
+    val specFirstSeen: String,
+    val specLastSeen: String,
+    val openPortsHeader: (Int) -> String,
+    val openPortsSubtitle: String,
+    val rescanBtn: String,
+    val auditingBtn: String,
+    val riskPrefix: String,
+    val pingJitterBtn: String,
+    val wakeOnLanBtn: String,
+    val icmpPingTelemetryTitle: String,
+    val minLabel: String,
+    val avgLabel: String,
+    val maxLabel: String,
+
+    // Traffic & Consumption Screen
+    val liveDownloadTitle: String,
+    val liveUploadTitle: String,
+    val peakPrefix: String,
+    val realtimeSubnetTrafficHeader: String,
+    val realtimeSubnetTrafficSub: String,
+    val sessionTotalPrefix: String,
+    val downloadLegend: String,
+    val uploadLegend: String,
+    val protocolDistributionHeader: String,
+    val sessionLabel: String,
+    val wifiSpectrumHeader: String,
+    val channelWord: String,
+    val deviceBandwidthRankingHeader: String,
+
+    // Pro Tools Screen
+    val toolTabAll: String,
+    val toolTabSpeedHeatmap: String,
+    val toolTabTracerouteDns: String,
+    val toolTabSubnetCalc: String,
+    val dualSpeedTestHeader: String,
+    val dualSpeedTestSub: String,
+    val wifiLanInternalLabel: String,
+    val wanDownloadLabel: String,
+    val wanUploadLabel: String,
+    val startSpeedTestBtn: String,
+    val measuringSpeedBtn: String,
+    val signalHeatmapHeader: String,
+    val signalHeatmapSub: String,
+    val roomNameInputLabel: String,
+    val measureRoomBtn: String,
+    val visualTracerouteHeader: String,
+    val visualTracerouteSub: String,
+    val targetDomainOrIpLabel: String,
+    val startRouteBtn: String,
+    val tracingRouteBtn: String,
+    val dnsBenchmarkHeader: String,
+    val dnsBenchmarkSub: String,
+    val queriedDomainLabel: String,
+    val runDnsBenchmarkBtn: String,
+    val fastestBadge: String,
+    val subnetCalculatorHeader: String,
+    val subnetCalculatorSub: String,
+    val baseIpv4Label: String,
+    val netIdLabel: String,
+    val netmaskLabel: String,
+    val wildcardMaskLabel: String,
+    val usableHostRangeLabel: String,
+    val broadcastAddressLabel: String,
+    val totalUsableHostsLabel: String,
+    val hostsWord: String,
+    val networkClassLabel: String,
+
+    // Security & Alerts Screen
+    val securityStatusGood: String,
+    val securityStatusWarning: String,
+    val securityStatusCritical: String,
+    val securitySummaryBody: (Int, Int) -> String,
+    val testPushNotificationBtn: String,
+    val arpAndRouterAuditHeader: String,
+    val arpSpoofingProtectionLabel: String,
+    val dnsHijackingIntegrityLabel: String,
+    val exposedRouterPortsLabel: String,
+    val noneWord: String,
+    val hiddenCameraDetectorHeader: String,
+    val hiddenCameraDetectorSub: (Int) -> String,
+    val verifiedCameraBadge: String,
+    val suspiciousCameraBadge: String,
+    val quarantineQueueHeader: (Int) -> String,
+    val allDevicesAuthorizedTitle: String,
+    val allDevicesAuthorizedSub: String,
+    val markTrustedBtn: String,
+    val markSuspiciousBtn: String,
+    val watchdogServersHeader: String,
+    val watchdogServersSub: String,
+    val exposedPortsAuditHeader: String,
+    val inspectLink: String,
+    val autoAlertPoliciesHeader: String,
+    val policyUnknownMacTitle: String,
+    val policyUnknownMacSub: String,
+    val policyCriticalPortsTitle: String,
+    val policyCriticalPortsSub: String,
+    val policyArpGuardianTitle: String,
+    val policyArpGuardianSub: String,
+
+    // Secured History Screen
+    val vaultPinGateTitle: String,
+    val vaultPinGateDescription: String,
+    val enterPinLabel: (String) -> String,
+    val unlockBtn: String,
+    val biometricUnlockBtn: String,
+    val securedLogHeader: String,
+    val securedLogSub: (Int) -> String,
+    val exportReportBtn: String,
+    val changePinBtn: String,
+    val newPinLabel: String,
+    val savedNetworkProfilesHeader: String,
+    val authorizedDevicesSuffix: String,
+    val filterAllEvents: String,
+    val filterIntrusionEvents: String,
+    val filterConnectedEvents: String,
+    val filterPortEvents: String,
+    val filterTrustEvents: String,
+    val filterScanEvents: String,
+
+    // Theme & Language Picker Sheet
+    val themeAndDisplaySheetTitle: String,
+    val themeAndDisplaySheetSub: String,
+    val languageSelectorHeader: String,
+    val immersiveFullScreenTitle: String,
+    val immersiveFullScreenSub: String,
+    val chooseThemeHeader: String
+) {
+    fun categoryName(cat: DeviceCategory): String = when (this) {
+        EnglishStrings -> when (cat) {
+            DeviceCategory.ROUTER_GATEWAY -> "Router / Gateway"
+            DeviceCategory.SMARTPHONE -> "Smartphone / Mobile"
+            DeviceCategory.WORKSTATION_PC -> "Laptop / Workstation PC"
+            DeviceCategory.SMART_TV_MEDIA -> "Smart TV / Media"
+            DeviceCategory.IOT_SENSOR -> "IoT / Smart Home Sensor"
+            DeviceCategory.NAS_SERVER -> "NAS Storage / Server"
+            DeviceCategory.PRINTER -> "Network Printer"
+            DeviceCategory.SECURITY_CAMERA -> "IP Security Camera"
+            DeviceCategory.UNKNOWN -> "Unclassified Device"
+        }
+        ItalianStrings -> when (cat) {
+            DeviceCategory.ROUTER_GATEWAY -> "Router / Gateway"
+            DeviceCategory.SMARTPHONE -> "Smartphone / Mobile"
+            DeviceCategory.WORKSTATION_PC -> "Laptop / Workstation PC"
+            DeviceCategory.SMART_TV_MEDIA -> "Smart TV / Media"
+            DeviceCategory.IOT_SENSOR -> "Sensore IoT / Smart Home"
+            DeviceCategory.NAS_SERVER -> "Server / Archiviazione NAS"
+            DeviceCategory.PRINTER -> "Stampante di Rete"
+            DeviceCategory.SECURITY_CAMERA -> "Telecamera IP di Sicurezza"
+            DeviceCategory.UNKNOWN -> "Dispositivo Non Classificato"
+        }
+        GermanStrings -> when (cat) {
+            DeviceCategory.ROUTER_GATEWAY -> "Router / Gateway"
+            DeviceCategory.SMARTPHONE -> "Smartphone / Mobilgerät"
+            DeviceCategory.WORKSTATION_PC -> "Laptop / Workstation-PC"
+            DeviceCategory.SMART_TV_MEDIA -> "Smart-TV / Medien"
+            DeviceCategory.IOT_SENSOR -> "IoT- / Smart-Home-Sensor"
+            DeviceCategory.NAS_SERVER -> "NAS-Speicher / Server"
+            DeviceCategory.PRINTER -> "Netzwerkdrucker"
+            DeviceCategory.SECURITY_CAMERA -> "IP-Überwachungskamera"
+            DeviceCategory.UNKNOWN -> "Nicht klassifiziertes Gerät"
+        }
+        else -> cat.labelRo
+    }
+
+    fun trustName(trust: TrustStatus): String = when (this) {
+        EnglishStrings -> when (trust) {
+            TrustStatus.TRUSTED -> "Trusted"
+            TrustStatus.UNKNOWN_NEW -> "Unknown (New)"
+            TrustStatus.SUSPICIOUS_FLAGGED -> "Suspicious / Alert"
+        }
+        ItalianStrings -> when (trust) {
+            TrustStatus.TRUSTED -> "Affidabile"
+            TrustStatus.UNKNOWN_NEW -> "Sconosciuto (Nuovo)"
+            TrustStatus.SUSPICIOUS_FLAGGED -> "Sospetto / Allarme"
+        }
+        GermanStrings -> when (trust) {
+            TrustStatus.TRUSTED -> "Vertrauenswürdig"
+            TrustStatus.UNKNOWN_NEW -> "Unbekannt (Neu)"
+            TrustStatus.SUSPICIOUS_FLAGGED -> "Verdächtig / Warnung"
+        }
+        else -> trust.labelRo
+    }
+
+    fun sortOptionName(opt: DeviceSortOption): String = when (this) {
+        EnglishStrings -> when (opt) {
+            DeviceSortOption.RISK_FIRST -> "Risk & Unknown"
+            DeviceSortOption.BANDWIDTH_DESC -> "Traffic Usage"
+            DeviceSortOption.LATENCY_ASC -> "Ping / Latency"
+            DeviceSortOption.SIGNAL_DESC -> "Wi-Fi Signal"
+            DeviceSortOption.IP_ASC -> "IPv4 Address"
+        }
+        ItalianStrings -> when (opt) {
+            DeviceSortOption.RISK_FIRST -> "Rischio e Sconosciuti"
+            DeviceSortOption.BANDWIDTH_DESC -> "Consumo Traffico"
+            DeviceSortOption.LATENCY_ASC -> "Ping / Latenza"
+            DeviceSortOption.SIGNAL_DESC -> "Segnale Wi-Fi"
+            DeviceSortOption.IP_ASC -> "Indirizzo IPv4"
+        }
+        GermanStrings -> when (opt) {
+            DeviceSortOption.RISK_FIRST -> "Risiko & Unbekannt"
+            DeviceSortOption.BANDWIDTH_DESC -> "Datenverbrauch"
+            DeviceSortOption.LATENCY_ASC -> "Ping / Latenz"
+            DeviceSortOption.SIGNAL_DESC -> "WLAN-Signalstärke"
+            DeviceSortOption.IP_ASC -> "IPv4-Adresse"
+        }
+        else -> opt.labelRo
+    }
+
+    fun riskLevelName(rawRisk: String): String = when (this) {
+        EnglishStrings -> when (rawRisk) {
+            "CRITIC" -> "CRITICAL"
+            "MEDIU" -> "MEDIUM"
+            else -> "LOW"
+        }
+        ItalianStrings -> when (rawRisk) {
+            "CRITIC" -> "CRITICO"
+            "MEDIU" -> "MEDIO"
+            else -> "BASSO"
+        }
+        GermanStrings -> when (rawRisk) {
+            "CRITIC" -> "KRITISCH"
+            "MEDIU" -> "MITTEL"
+            else -> "NIEDRIG"
+        }
+        else -> rawRisk
+    }
+
+    fun severityName(rawSeverity: String): String = when (this) {
+        EnglishStrings -> when (rawSeverity) {
+            "CRITIC" -> "CRITICAL"
+            "AVERTISMENT" -> "WARNING"
+            else -> "INFO"
+        }
+        ItalianStrings -> when (rawSeverity) {
+            "CRITIC" -> "CRITICO"
+            "AVERTISMENT" -> "AVVISO"
+            else -> "INFO"
+        }
+        GermanStrings -> when (rawSeverity) {
+            "CRITIC" -> "KRITISCH"
+            "AVERTISMENT" -> "WARNUNG"
+            else -> "INFO"
+        }
+        else -> rawSeverity
+    }
+
+    fun themePresetTitles(preset: AppThemePreset): Pair<String, String> = when (this) {
+        EnglishStrings -> when (preset) {
+            AppThemePreset.CYBER_DARK -> "Cyber Telemetry (Default)" to "Obsidian navy with electric cyan and emerald accents"
+            AppThemePreset.MATRIX_TERMINAL -> "Matrix Hacker Green" to "High-contrast phosphor green terminal console"
+            AppThemePreset.RED_OPS_TACTICAL -> "Red Team Tactical" to "Stealth night operations palette with laser red and amber"
+            AppThemePreset.SYNTHWAVE_QUANTUM -> "Synthwave Quantum" to "Cosmic indigo with neon magenta and holographic cyan"
+            AppThemePreset.SOLAR_COMMAND -> "Solar Amber NOC" to "Dark bronze command center with golden telemetry"
+            AppThemePreset.ARCTIC_LIGHT -> "Arctic Daylight (Light)" to "Clean laboratory light interface for maximum outdoor legibility"
+        }
+        ItalianStrings -> when (preset) {
+            AppThemePreset.CYBER_DARK -> "Cyber Telemetry (Predefinito)" to "Blu ossidiana con accenti ciano elettrico e smeraldo"
+            AppThemePreset.MATRIX_TERMINAL -> "Matrix Hacker Green" to "Console terminale verde fosforo ad alto contrasto"
+            AppThemePreset.RED_OPS_TACTICAL -> "Red Team Tactical" to "Estetica notturna tattica con rosso laser e ambra"
+            AppThemePreset.SYNTHWAVE_QUANTUM -> "Synthwave Quantum" to "Indaco cosmico con magenta neon e ciano olografico"
+            AppThemePreset.SOLAR_COMMAND -> "Solar Amber NOC" to "Centro di controllo bronzo scuro con telemetria dorata"
+            AppThemePreset.ARCTIC_LIGHT -> "Arctic Daylight (Chiaro)" to "Interfaccia chiara da laboratorio per massima leggibilità"
+        }
+        GermanStrings -> when (preset) {
+            AppThemePreset.CYBER_DARK -> "Cyber Telemetry (Standard)" to "Obsidian-Marineblau mit Elektro-Cyan und Smaragdgrün"
+            AppThemePreset.MATRIX_TERMINAL -> "Matrix Hacker Green" to "Kontrastreiche Terminal-Konsole in Phosphorgrün"
+            AppThemePreset.RED_OPS_TACTICAL -> "Red Team Tactical" to "Taktisches Nachtdesign mit Laserrot und Bernstein"
+            AppThemePreset.SYNTHWAVE_QUANTUM -> "Synthwave Quantum" to "Kosmisches Indigo mit Neon-Magenta und Hologramm-Cyan"
+            AppThemePreset.SOLAR_COMMAND -> "Solar Amber NOC" to "Dunkelbronze-Leitstand mit goldener Telemetrie"
+            AppThemePreset.ARCTIC_LIGHT -> "Arctic Daylight (Hell)" to "Helle Laboroberfläche für maximale Lesbarkeit bei Tageslicht"
+        }
+        else -> preset.titleRo to preset.subtitleRo
+    }
+}
+
+val RomanianStrings = AppStrings(
+    navRadar = "Scaner",
+    navTraffic = "Trafic",
+    navTools = "Unelte Pro",
+    navAlerts = "Securitate",
+    navHistory = "Istoric",
+    nodesCountLabel = "noduri",
+    alertsBadgeSuffix = "ALERTE",
+    localIpLabel = "IP LOCAL",
+    gatewayLabel = "GATEWAY",
+    subnetLabel = "SUBREȚEA",
+    signalRssiLabel = "SEMNAL RSSI",
+    linkSpeedLabel = "VITEZĂ LINK",
+    interfaceLabel = "INTERFAȚĂ",
+    activeDnsPrefix = "DNS Activ",
+    encryptionPrefix = "Criptare",
+    scanNetworkBtn = "Scanează Subrețeaua LAN",
+    scanningInProgressBtn = "Scanare în curs…",
+    exactSsidBtn = "SSID Exact",
+    intrusionBannerTitle = { count -> "Alertă: $count Dispozitive Necunoscute pe Wi-Fi" },
+    intrusionBannerSuspiciousBody = { count -> "$count aparat(e) prezintă porturi vulnerabile deschise (RTSP/Telnet). Apasă pentru izolare și audit." },
+    intrusionBannerUnknownBody = "S-au detectat aparate neautorizate conectate la subrețea. Verifică amprentele MAC și OUI.",
+    searchPlaceholder = "Caută după IP, MAC, producător OUI, OS sau port (ex. 554, Apple)…",
+    filterAll = "Toate",
+    filterSuspicious = "Suspecte",
+    filterUnknown = "Necunoscute",
+    filterTrusted = "De Încredere",
+    sortPrefix = "Ordine:",
+    connectedDevicesHeader = { count -> "APARATE CONECTATE ÎN TIMP REAL ($count)" },
+    tapForTechnicalInspection = "Apasă pentru inspecție tehnică",
+    youBadge = "TU",
+    aboutSubtitle = "Scaner Profesional Wi-Fi & LAN, Audit Securitate și Telemetrie în Timp Real",
+    editIdentityTitle = "Personalizare Identitate & Locație",
+    aliasLabel = "Denumire Dispozitiv (Alias)",
+    roomZoneLabel = "Cameră / Zonă Fizică",
+    technicalNotesLabel = "Note Tehnice / Observații Audit",
+    saveBtn = "Salvează",
+    securityAuthSectionTitle = "STATUT DE SECURITATE ȘI AUTORIZARE REȚEA",
+    watchdogUptimeTitle = { pct -> "Watchdog 24/7 Uptime ($pct%)" },
+    watchdogUptimeSubtitle = "Alertă la deconectarea echipamentului din LAN",
+    fullHardwareSpecHeader = "FIȘĂ TEHNICĂ COMPLETĂ HARDWARE & REȚEA",
+    specIpv4 = "Adresă IPv4",
+    specIpv6 = "Adresă IPv6 Locală",
+    specMac = "Adresă Fizică MAC",
+    specVendorOui = "Producător OUI IEEE",
+    specHostname = "Hostname Rețea (rDNS)",
+    specOsFingerprint = "Amprentă Sistem Operare",
+    specDhcpType = "Alocare IP / DHCP",
+    specBandSpeed = "Banda & Viteză Link",
+    specSignalPing = "Putere Semnal & Ping",
+    specMdns = "Servicii mDNS / Bonjour",
+    specCurrentTraffic = "Trafic Curent & Total",
+    specFirstSeen = "Prima Detectare",
+    specLastSeen = "Ultima Activitate",
+    openPortsHeader = { count -> "PORTURI TCP/UDP DESCHISE ($count)" },
+    openPortsSubtitle = "Servicii expuse și bannere de protocol detectate",
+    rescanBtn = "Re-scanează",
+    auditingBtn = "Audit…",
+    riskPrefix = "RISC",
+    pingJitterBtn = "Test Ping & Jitter",
+    wakeOnLanBtn = "Wake-on-LAN",
+    icmpPingTelemetryTitle = "TELEMETRIE ICMP PING",
+    minLabel = "MIN",
+    avgLabel = "MEDIE",
+    maxLabel = "MAX",
+    liveDownloadTitle = "DOWNLOAD LIVE",
+    liveUploadTitle = "UPLOAD LIVE",
+    peakPrefix = "Vârf",
+    realtimeSubnetTrafficHeader = "FLUX TRAFIC SUBREȚEA ÎN TIMP REAL",
+    realtimeSubnetTrafficSub = "Monitorizare continuă pachete RX/TX (TrafficStats + Sonde LAN)",
+    sessionTotalPrefix = "Total",
+    downloadLegend = "Download (RX KB/s)",
+    uploadLegend = "Upload (TX KB/s)",
+    protocolDistributionHeader = "DISTRIBUȚIE CONSUM PE PROTOCOALE & SERVICII",
+    sessionLabel = "Sesiune",
+    wifiSpectrumHeader = "ANALIZĂ SPECTRU RADIO & CONGESTIE CANAL WI-FI",
+    channelWord = "Canalul",
+    deviceBandwidthRankingHeader = "CLASAMENT CONSUM TRAFIC PE DISPOZITIVE",
+    toolTabAll = "Toate Uneltele",
+    toolTabSpeedHeatmap = "SpeedTest & Semnal Camere",
+    toolTabTracerouteDns = "Traceroute & DNS",
+    toolTabSubnetCalc = "Calculator CIDR",
+    dualSpeedTestHeader = "SPEEDTEST DUAL: LAN INTERN vs. INTERNET WAN",
+    dualSpeedTestSub = "Separă viteza radio telefon↔router față de viteza conexiunii ISP",
+    wifiLanInternalLabel = "WI-FI LAN INTERN",
+    wanDownloadLabel = "WAN DOWNLOAD",
+    wanUploadLabel = "WAN UPLOAD",
+    startSpeedTestBtn = "Start SpeedTest",
+    measuringSpeedBtn = "Se măsoară…",
+    signalHeatmapHeader = "CARTOGRAFIERE SEMNAL WI-FI PE CAMERE (HEATMAP)",
+    signalHeatmapSub = "Identifică zonele cu atenuare mare care necesită un nod Wi-Fi Mesh",
+    roomNameInputLabel = "Nume Încăpere / Zonă",
+    measureRoomBtn = "Măsoară",
+    visualTracerouteHeader = "TRACEROUTE VIZUAL & ANALIZĂ HOP-BY-HOP",
+    visualTracerouteSub = "Urmărește ruta pachetelor de la Gateway prin nodurile ISP și IXP",
+    targetDomainOrIpLabel = "Domeniu sau IP Destinație",
+    startRouteBtn = "Start Rută",
+    tracingRouteBtn = "Traseu…",
+    dnsBenchmarkHeader = "DNS LOOKUP & BENCHMARK VITEZĂ RESOLVERE",
+    dnsBenchmarkSub = "Compară timpul de răspuns între DNS-ul local, Cloudflare, Google și Quad9",
+    queriedDomainLabel = "Domeniu Interogat (A/AAAA)",
+    runDnsBenchmarkBtn = "Benchmark DNS",
+    fastestBadge = "CEL MAI RAPID",
+    subnetCalculatorHeader = "CALCULATOR SUBREȚEA IPv4 / CIDR & VLAN",
+    subnetCalculatorSub = "Calculează masca subrețelei, plaja de gazde și adresa de broadcast",
+    baseIpv4Label = "Adresă IPv4 de bază",
+    netIdLabel = "Adresă Rețea (Network ID)",
+    netmaskLabel = "Mască Subrețea (Netmask)",
+    wildcardMaskLabel = "Mască Wildcard (ACL)",
+    usableHostRangeLabel = "Interval Gazde Utilizabile",
+    broadcastAddressLabel = "Adresă Broadcast",
+    totalUsableHostsLabel = "Total Gazde (Usable Hosts)",
+    hostsWord = "aparate",
+    networkClassLabel = "Tipologie / Clasă",
+    securityStatusGood = "Rețea Bine Securizată",
+    securityStatusWarning = "Atenție: Aparate Neautorizate",
+    securityStatusCritical = "Risc Ridicat de Intruziune LAN",
+    securitySummaryBody = { unk, risky -> "$unk dispozitive necunoscute/suspecte și $risky aparate cu porturi vulnerabile expuse pe Wi-Fi." },
+    testPushNotificationBtn = "Testează Alerta Push în Bara de Stare Android",
+    arpAndRouterAuditHeader = "DETECTOR ARP SPOOFING (MitM) & AUDIT ROUTER",
+    arpSpoofingProtectionLabel = "Protecție ARP Spoofing",
+    dnsHijackingIntegrityLabel = "Integritate DNS Hijacking",
+    exposedRouterPortsLabel = "Porturi Admin Router Expuse",
+    noneWord = "Niciunul",
+    hiddenCameraDetectorHeader = "DETECTOR CAMERE ASCUNSE (SPYCAM & RTSP/ONVIF)",
+    hiddenCameraDetectorSub = { count -> "$count dispozitiv(e) video identificat(e) pe subrețeaua Wi-Fi" },
+    verifiedCameraBadge = "VERIFICATĂ",
+    suspiciousCameraBadge = "SUSPECTĂ",
+    quarantineQueueHeader = { count -> "COADĂ CARANTINĂ DISPOZITIVE NECUNOSCUTE ($count)" },
+    allDevicesAuthorizedTitle = "Toate dispozitivele conectate sunt autorizate",
+    allDevicesAuthorizedSub = "Niciun aparat necunoscut nu este activ în acest moment pe subrețeaua Wi-Fi.",
+    markTrustedBtn = "Marchează De Încredere",
+    markSuspiciousBtn = "Marchează Suspect",
+    watchdogServersHeader = "WATCHDOG 24/7 & MONITORIZARE UPTIME SERVERE",
+    watchdogServersSub = "Alertează automat dacă un echipament critic (Router, NAS, Cameră) devine offline",
+    exposedPortsAuditHeader = "AUDIT PORTURI DESCHISE ȘI VULNERABILITĂȚI LAN",
+    inspectLink = "Inspectează →",
+    autoAlertPoliciesHeader = "POLITICI DE ALERTARE AUTOMATĂ",
+    policyUnknownMacTitle = "Alertă la Dispozitive Noi (MAC Necunoscut)",
+    policyUnknownMacSub = "Notifică instant când o adresă MAC neînregistrată primește IP prin DHCP",
+    policyCriticalPortsTitle = "Detecție Porturi Critice (Telnet, RTSP, SMB)",
+    policyCriticalPortsSub = "Avertizează dacă un dispozitiv expune servicii necriptate în subrețea",
+    policyArpGuardianTitle = "Gardian ARP & Monitorizare Continuă",
+    policyArpGuardianSub = "Verifică periodic integritatea adresei MAC a gateway-ului împotriva ARP Spoofing",
+    vaultPinGateTitle = "Istoric de Conectare Securizat",
+    vaultPinGateDescription = "Jurnalul de conectare LAN și amprentele SHA-256 ale aparatelor sunt protejate prin cod PIN sau Autentificare Biometrică pentru a preveni alterarea neautorizată.",
+    enterPinLabel = { hint -> "Introdu Codul PIN (Implicit: $hint)" },
+    unlockBtn = "Deblochează",
+    biometricUnlockBtn = "Autentificare Biometrică / Amprentă",
+    securedLogHeader = "Jurnal de Conectare Securizat (SHA-256)",
+    securedLogSub = { count -> "$count înregistrări semnate criptografic în baza locală Room" },
+    exportReportBtn = "Exportă Raport",
+    changePinBtn = "Schimbă PIN",
+    newPinLabel = "PIN Nou (minim 4 cifre)",
+    savedNetworkProfilesHeader = "PROFILURI DE REȚEA SALVATE (ACASĂ / BIROU / TRAVEL)",
+    authorizedDevicesSuffix = "aparate autorizate",
+    filterAllEvents = "Toate Evenimentele",
+    filterIntrusionEvents = "Alerte Intruziune",
+    filterConnectedEvents = "Conectări Dispozitive",
+    filterPortEvents = "Audit Porturi",
+    filterTrustEvents = "Autorizări",
+    filterScanEvents = "Scanări Rețea",
+    themeAndDisplaySheetTitle = "Teme, Limbă & Afișare Full Screen",
+    themeAndDisplaySheetSub = "Personalizează limba, paleta cromatică și modul imersiv al consolei",
+    languageSelectorHeader = "SELECTEAZĂ LIMBA INTERFEȚEI (4 LIMBI)",
+    immersiveFullScreenTitle = "Mod Imersiv Full Screen la Pornire",
+    immersiveFullScreenSub = "Ascunde automat barele de sistem pentru spațiu maxim de telemetrie",
+    chooseThemeHeader = "ALEGE TEMA INTERFEȚEI (6 PALETE DISPONIBILE)"
+)
+
+val EnglishStrings = AppStrings(
+    navRadar = "Scanner",
+    navTraffic = "Traffic",
+    navTools = "Pro Tools",
+    navAlerts = "Security",
+    navHistory = "History",
+    nodesCountLabel = "nodes",
+    alertsBadgeSuffix = "ALERTS",
+    localIpLabel = "LOCAL IP",
+    gatewayLabel = "GATEWAY",
+    subnetLabel = "SUBNET",
+    signalRssiLabel = "RSSI SIGNAL",
+    linkSpeedLabel = "LINK SPEED",
+    interfaceLabel = "INTERFACE",
+    activeDnsPrefix = "Active DNS",
+    encryptionPrefix = "Security",
+    scanNetworkBtn = "Scan LAN Subnet",
+    scanningInProgressBtn = "Scanning subnet…",
+    exactSsidBtn = "Exact SSID",
+    intrusionBannerTitle = { count -> "Alert: $count Unknown Devices on Wi-Fi" },
+    intrusionBannerSuspiciousBody = { count -> "$count device(s) expose vulnerable ports (RTSP/Telnet). Tap to isolate and audit." },
+    intrusionBannerUnknownBody = "Unauthorized devices detected on the local subnet. Verify MAC and OUI fingerprints.",
+    searchPlaceholder = "Search by IP, MAC, OUI vendor, OS, or port (e.g. 554, Apple)…",
+    filterAll = "All",
+    filterSuspicious = "Suspicious",
+    filterUnknown = "Unknown",
+    filterTrusted = "Trusted",
+    sortPrefix = "Sort by:",
+    connectedDevicesHeader = { count -> "REAL-TIME CONNECTED DEVICES ($count)" },
+    tapForTechnicalInspection = "Tap for deep inspection",
+    youBadge = "YOU",
+    aboutSubtitle = "Professional Wi-Fi & LAN Scanner, Security Audit & Real-Time Telemetry",
+    editIdentityTitle = "Customize Device Identity & Location",
+    aliasLabel = "Device Name (Alias)",
+    roomZoneLabel = "Room / Physical Zone",
+    technicalNotesLabel = "Technical Notes / Audit Observations",
+    saveBtn = "Save",
+    securityAuthSectionTitle = "NETWORK SECURITY & TRUST AUTHORIZATION",
+    watchdogUptimeTitle = { pct -> "24/7 Uptime Watchdog ($pct%)" },
+    watchdogUptimeSubtitle = "Alert immediately if this host disconnects from LAN",
+    fullHardwareSpecHeader = "COMPLETE HARDWARE & NETWORK SPECIFICATION",
+    specIpv4 = "IPv4 Address",
+    specIpv6 = "Link-Local IPv6",
+    specMac = "Physical MAC Address",
+    specVendorOui = "IEEE OUI Manufacturer",
+    specHostname = "Network Hostname (rDNS)",
+    specOsFingerprint = "OS Kernel Fingerprint",
+    specDhcpType = "IP Allocation / DHCP",
+    specBandSpeed = "Frequency Band & Link Speed",
+    specSignalPing = "Signal Strength & Ping",
+    specMdns = "mDNS / Bonjour Services",
+    specCurrentTraffic = "Live & Session Traffic",
+    specFirstSeen = "First Discovered",
+    specLastSeen = "Last Active",
+    openPortsHeader = { count -> "OPEN TCP/UDP PORTS ($count)" },
+    openPortsSubtitle = "Exposed network services and detected protocol banners",
+    rescanBtn = "Rescan Ports",
+    auditingBtn = "Auditing…",
+    riskPrefix = "RISK",
+    pingJitterBtn = "Ping & Jitter Test",
+    wakeOnLanBtn = "Wake-on-LAN",
+    icmpPingTelemetryTitle = "ICMP PING TELEMETRY",
+    minLabel = "MIN",
+    avgLabel = "AVG",
+    maxLabel = "MAX",
+    liveDownloadTitle = "LIVE DOWNLOAD",
+    liveUploadTitle = "LIVE UPLOAD",
+    peakPrefix = "Peak",
+    realtimeSubnetTrafficHeader = "REAL-TIME SUBNET TRAFFIC STREAM",
+    realtimeSubnetTrafficSub = "Continuous RX/TX packet telemetry (TrafficStats + LAN Probes)",
+    sessionTotalPrefix = "Total",
+    downloadLegend = "Download (RX KB/s)",
+    uploadLegend = "Upload (TX KB/s)",
+    protocolDistributionHeader = "BANDWIDTH SHARE BY PROTOCOL & SERVICE",
+    sessionLabel = "Session",
+    wifiSpectrumHeader = "RADIO SPECTRUM & WI-FI CHANNEL CONGESTION",
+    channelWord = "Channel",
+    deviceBandwidthRankingHeader = "BANDWIDTH CONSUMPTION RANKING BY DEVICE",
+    toolTabAll = "All Tools",
+    toolTabSpeedHeatmap = "SpeedTest & Room Heatmap",
+    toolTabTracerouteDns = "Traceroute & DNS",
+    toolTabSubnetCalc = "CIDR Calculator",
+    dualSpeedTestHeader = "DUAL SPEEDTEST: INTERNAL LAN vs. WAN INTERNET",
+    dualSpeedTestSub = "Compare phone↔router wireless link speed against ISP WAN throughput",
+    wifiLanInternalLabel = "INTERNAL WI-FI LAN",
+    wanDownloadLabel = "WAN DOWNLOAD",
+    wanUploadLabel = "WAN UPLOAD",
+    startSpeedTestBtn = "Start SpeedTest",
+    measuringSpeedBtn = "Measuring…",
+    signalHeatmapHeader = "WI-FI ROOM SIGNAL HEATMAP & MESH ADVISOR",
+    signalHeatmapSub = "Identify high-attenuation dead zones requiring a Wi-Fi Mesh node",
+    roomNameInputLabel = "Room / Zone Name",
+    measureRoomBtn = "Measure",
+    visualTracerouteHeader = "VISUAL HOP-BY-HOP TRACEROUTE",
+    visualTracerouteSub = "Trace packet path from local Gateway across ISP and IXP backbone nodes",
+    targetDomainOrIpLabel = "Target Domain or IP Address",
+    startRouteBtn = "Trace Route",
+    tracingRouteBtn = "Tracing…",
+    dnsBenchmarkHeader = "DNS LOOKUP & RESOLVER SPEED BENCHMARK",
+    dnsBenchmarkSub = "Compare query response latency across Local Gateway, Cloudflare, Google & Quad9",
+    queriedDomainLabel = "Queried Domain (A/AAAA)",
+    runDnsBenchmarkBtn = "DNS Benchmark",
+    fastestBadge = "FASTEST",
+    subnetCalculatorHeader = "IPv4 / CIDR SUBNET & VLAN CALCULATOR",
+    subnetCalculatorSub = "Calculate netmask, wildcard ACL mask, usable host range, and broadcast",
+    baseIpv4Label = "Base IPv4 Address",
+    netIdLabel = "Network Address (ID)",
+    netmaskLabel = "Subnet Mask (Netmask)",
+    wildcardMaskLabel = "Wildcard Mask (ACL)",
+    usableHostRangeLabel = "Usable Host IP Range",
+    broadcastAddressLabel = "Broadcast Address",
+    totalUsableHostsLabel = "Total Usable Hosts",
+    hostsWord = "hosts",
+    networkClassLabel = "Network Class / Topology",
+    securityStatusGood = "Network Well Secured",
+    securityStatusWarning = "Warning: Unauthorized Devices",
+    securityStatusCritical = "High LAN Intrusion Risk",
+    securitySummaryBody = { unk, risky -> "$unk unknown/suspicious device(s) and $risky host(s) with vulnerable open ports on Wi-Fi." },
+    testPushNotificationBtn = "Test Native Android Security Push Notification",
+    arpAndRouterAuditHeader = "ARP SPOOFING (MitM) DETECTOR & ROUTER AUDIT",
+    arpSpoofingProtectionLabel = "ARP Spoofing Protection",
+    dnsHijackingIntegrityLabel = "DNS Hijacking Integrity",
+    exposedRouterPortsLabel = "Exposed Router Admin Ports",
+    noneWord = "None",
+    hiddenCameraDetectorHeader = "HIDDEN CAMERA DETECTOR (SPYCAM & RTSP/ONVIF)",
+    hiddenCameraDetectorSub = { count -> "$count video streaming device(s) identified on the Wi-Fi subnet" },
+    verifiedCameraBadge = "VERIFIED",
+    suspiciousCameraBadge = "SUSPICIOUS",
+    quarantineQueueHeader = { count -> "UNKNOWN DEVICES QUARANTINE QUEUE ($count)" },
+    allDevicesAuthorizedTitle = "All connected devices are authorized",
+    allDevicesAuthorizedSub = "No unknown devices are currently active on your Wi-Fi subnet.",
+    markTrustedBtn = "Mark as Trusted",
+    markSuspiciousBtn = "Flag Suspicious",
+    watchdogServersHeader = "24/7 WATCHDOG & SERVER UPTIME MONITOR",
+    watchdogServersSub = "Automatically alert if a critical host (Router, NAS, Camera) goes offline",
+    exposedPortsAuditHeader = "OPEN PORTS & LAN VULNERABILITY AUDIT",
+    inspectLink = "Inspect →",
+    autoAlertPoliciesHeader = "AUTOMATED SECURITY ALERT POLICIES",
+    policyUnknownMacTitle = "New Device Alert (Unknown MAC Address)",
+    policyUnknownMacSub = "Notify immediately when an unrecognized MAC receives a DHCP lease",
+    policyCriticalPortsTitle = "Critical Port Detection (Telnet, RTSP, SMB)",
+    policyCriticalPortsSub = "Warn whenever a host exposes unencrypted services on the LAN",
+    policyArpGuardianTitle = "ARP Guardian & Continuous Monitoring",
+    policyArpGuardianSub = "Periodically verify gateway MAC integrity against ARP Spoofing attacks",
+    vaultPinGateTitle = "Secured Connection History",
+    vaultPinGateDescription = "The LAN connection log and SHA-256 device signatures are protected via PIN or Biometric Authentication to prevent tampering with audit evidence.",
+    enterPinLabel = { hint -> "Enter Vault PIN (Default: $hint)" },
+    unlockBtn = "Unlock",
+    biometricUnlockBtn = "Biometric / Fingerprint Unlock",
+    securedLogHeader = "Cryptographic Connection Log (SHA-256)",
+    securedLogSub = { count -> "$count tamper-evident signed records stored in local Room DB" },
+    exportReportBtn = "Export Report",
+    changePinBtn = "Change PIN",
+    newPinLabel = "New PIN (min 4 digits)",
+    savedNetworkProfilesHeader = "SAVED NETWORK PROFILES (HOME / OFFICE / TRAVEL)",
+    authorizedDevicesSuffix = "trusted devices",
+    filterAllEvents = "All Events",
+    filterIntrusionEvents = "Intrusion Alerts",
+    filterConnectedEvents = "Device Connections",
+    filterPortEvents = "Port Audits",
+    filterTrustEvents = "Trust Updates",
+    filterScanEvents = "Subnet Scans",
+    themeAndDisplaySheetTitle = "Themes, Language & Full Screen",
+    themeAndDisplaySheetSub = "Customize interface language, color scheme, and immersive mode",
+    languageSelectorHeader = "SELECT INTERFACE LANGUAGE (4 LANGUAGES)",
+    immersiveFullScreenTitle = "Immersive Full Screen on Startup",
+    immersiveFullScreenSub = "Automatically hide system bars for maximum telemetry workspace",
+    chooseThemeHeader = "CHOOSE VISUAL THEME (6 PALETTES AVAILABLE)"
+)
+
+val ItalianStrings = AppStrings(
+    navRadar = "Scanner",
+    navTraffic = "Traffico",
+    navTools = "Strumenti",
+    navAlerts = "Sicurezza",
+    navHistory = "Cronologia",
+    nodesCountLabel = "nodi",
+    alertsBadgeSuffix = "AVVISI",
+    localIpLabel = "IP LOCALE",
+    gatewayLabel = "GATEWAY",
+    subnetLabel = "SOTTORETE",
+    signalRssiLabel = "SEGNALE RSSI",
+    linkSpeedLabel = "VELOCITÀ LINK",
+    interfaceLabel = "INTERFACCIA",
+    activeDnsPrefix = "DNS Attivo",
+    encryptionPrefix = "Sicurezza",
+    scanNetworkBtn = "Scansiona Sottorete LAN",
+    scanningInProgressBtn = "Scansione in corso…",
+    exactSsidBtn = "SSID Esatto",
+    intrusionBannerTitle = { count -> "Avviso: $count Dispositivi Sconosciuti sul Wi-Fi" },
+    intrusionBannerSuspiciousBody = { count -> "$count dispositivo/i espone porte vulnerabili (RTSP/Telnet). Tocca per isolare e analizzare." },
+    intrusionBannerUnknownBody = "Rilevati dispositivi non autorizzati connessi alla sottorete. Verifica le impronte MAC e OUI.",
+    searchPlaceholder = "Cerca per IP, MAC, produttore OUI, OS o porta (es. 554, Apple)…",
+    filterAll = "Tutti",
+    filterSuspicious = "Sospetti",
+    filterUnknown = "Sconosciuti",
+    filterTrusted = "Affidabili",
+    sortPrefix = "Ordina per:",
+    connectedDevicesHeader = { count -> "DISPOSITIVI CONNESSI IN TEMPO REALE ($count)" },
+    tapForTechnicalInspection = "Tocca per ispezione tecnica",
+    youBadge = "TU",
+    aboutSubtitle = "Scanner Professionale Wi-Fi & LAN, Audit di Sicurezza e Telemetria Live",
+    editIdentityTitle = "Personalizza Identità e Posizione Dispositivo",
+    aliasLabel = "Nome Dispositivo (Alias)",
+    roomZoneLabel = "Stanza / Zona Fisica",
+    technicalNotesLabel = "Note Tecniche / Osservazioni Audit",
+    saveBtn = "Salva",
+    securityAuthSectionTitle = "STATO DI SICUREZZA E AUTORIZZAZIONE RETE",
+    watchdogUptimeTitle = { pct -> "Watchdog Uptime 24/7 ($pct%)" },
+    watchdogUptimeSubtitle = "Avvisa immediatamente se il dispositivo si disconnette dalla LAN",
+    fullHardwareSpecHeader = "SCHEDA TECNICA COMPLETA HARDWARE E RETE",
+    specIpv4 = "Indirizzo IPv4",
+    specIpv6 = "Indirizzo IPv6 Locale",
+    specMac = "Indirizzo Fisico MAC",
+    specVendorOui = "Produttore OUI IEEE",
+    specHostname = "Hostname di Rete (rDNS)",
+    specOsFingerprint = "Impronta Sistema Operativo",
+    specDhcpType = "Assegnazione IP / DHCP",
+    specBandSpeed = "Banda e Velocità Link",
+    specSignalPing = "Potenza Segnale e Ping",
+    specMdns = "Servizi mDNS / Bonjour",
+    specCurrentTraffic = "Traffico Attuale e Totale",
+    specFirstSeen = "Primo Rilevamento",
+    specLastSeen = "Ultima Attività",
+    openPortsHeader = { count -> "PORTE TCP/UDP APERTE ($count)" },
+    openPortsSubtitle = "Servizi esposti e banner di protocollo rilevati",
+    rescanBtn = "Riscansiona",
+    auditingBtn = "Analisi…",
+    riskPrefix = "RISCHIO",
+    pingJitterBtn = "Test Ping e Jitter",
+    wakeOnLanBtn = "Wake-on-LAN",
+    icmpPingTelemetryTitle = "TELEMETRIA PING ICMP",
+    minLabel = "MIN",
+    avgLabel = "MEDIA",
+    maxLabel = "MAX",
+    liveDownloadTitle = "DOWNLOAD LIVE",
+    liveUploadTitle = "UPLOAD LIVE",
+    peakPrefix = "Picco",
+    realtimeSubnetTrafficHeader = "FLUSSO TRAFFICO SOTTORETE IN TEMPO REALE",
+    realtimeSubnetTrafficSub = "Monitoraggio continuo pacchetti RX/TX (TrafficStats + Sonde LAN)",
+    sessionTotalPrefix = "Totale",
+    downloadLegend = "Download (RX KB/s)",
+    uploadLegend = "Upload (TX KB/s)",
+    protocolDistributionHeader = "DISTRIBUZIONE CONSUMI PER PROTOCOLLO E SERVIZIO",
+    sessionLabel = "Sessione",
+    wifiSpectrumHeader = "ANALISI SPETTRO RADIO E CONGESTIONE CANALE WI-FI",
+    channelWord = "Canale",
+    deviceBandwidthRankingHeader = "CLASSIFICA CONSUMO BANDA PER DISPOSITIVO",
+    toolTabAll = "Tutti gli Strumenti",
+    toolTabSpeedHeatmap = "SpeedTest e Mappa Segnale",
+    toolTabTracerouteDns = "Traceroute e DNS",
+    toolTabSubnetCalc = "Calcolatore CIDR",
+    dualSpeedTestHeader = "SPEEDTEST DOPPIO: LAN INTERNA vs. INTERNET WAN",
+    dualSpeedTestSub = "Confronta la velocità radio telefono↔router con la banda WAN dell'operatore",
+    wifiLanInternalLabel = "WI-FI LAN INTERNA",
+    wanDownloadLabel = "DOWNLOAD WAN",
+    wanUploadLabel = "UPLOAD WAN",
+    startSpeedTestBtn = "Avvia SpeedTest",
+    measuringSpeedBtn = "Misurazione…",
+    signalHeatmapHeader = "MAPPATURA SEGNALE WI-FI PER STANZA (HEATMAP)",
+    signalHeatmapSub = "Individua le zone d'ombra ad alta attenuazione che richiedono un nodo Mesh",
+    roomNameInputLabel = "Nome Stanza / Zona",
+    measureRoomBtn = "Misura",
+    visualTracerouteHeader = "TRACEROUTE VISIVO E ANALISI HOP-BY-HOP",
+    visualTracerouteSub = "Traccia il percorso dei pacchetti dal Gateway attraverso i nodi ISP e IXP",
+    targetDomainOrIpLabel = "Dominio o IP di Destinazione",
+    startRouteBtn = "Avvia Percorso",
+    tracingRouteBtn = "Tracciamento…",
+    dnsBenchmarkHeader = "DNS LOOKUP E BENCHMARK VELOCITÀ RESOLVER",
+    dnsBenchmarkSub = "Confronta i tempi di risposta tra DNS locale, Cloudflare, Google e Quad9",
+    queriedDomainLabel = "Dominio Interrogato (A/AAAA)",
+    runDnsBenchmarkBtn = "Benchmark DNS",
+    fastestBadge = "PIÙ VELOCE",
+    subnetCalculatorHeader = "CALCOLATORE SOTTORETE IPv4 / CIDR E VLAN",
+    subnetCalculatorSub = "Calcola maschera di sottorete, wildcard ACL, intervallo host e broadcast",
+    baseIpv4Label = "Indirizzo IPv4 di Base",
+    netIdLabel = "Indirizzo di Rete (Network ID)",
+    netmaskLabel = "Maschera di Sottorete (Netmask)",
+    wildcardMaskLabel = "Maschera Wildcard (ACL)",
+    usableHostRangeLabel = "Intervallo Host Utilizzabili",
+    broadcastAddressLabel = "Indirizzo di Broadcast",
+    totalUsableHostsLabel = "Totale Host Utilizzabili",
+    hostsWord = "dispositivi",
+    networkClassLabel = "Tipologia / Classe di Rete",
+    securityStatusGood = "Rete Ben Protetta",
+    securityStatusWarning = "Attenzione: Dispositivi Non Autorizzati",
+    securityStatusCritical = "Alto Rischio di Intrusione LAN",
+    securitySummaryBody = { unk, risky -> "$unk dispositivi sconosciuti/sospetti e $risky apparati con porte vulnerabili esposte sul Wi-Fi." },
+    testPushNotificationBtn = "Testa Notifica Push di Sicurezza Android",
+    arpAndRouterAuditHeader = "RILEVATORE ARP SPOOFING (MitM) E AUDIT ROUTER",
+    arpSpoofingProtectionLabel = "Protezione ARP Spoofing",
+    dnsHijackingIntegrityLabel = "Integrità DNS Hijacking",
+    exposedRouterPortsLabel = "Porte Admin Router Esposte",
+    noneWord = "Nessuna",
+    hiddenCameraDetectorHeader = "RILEVATORE TELECAMERE NASCOSTE (SPYCAM & RTSP/ONVIF)",
+    hiddenCameraDetectorSub = { count -> "$count dispositivo/i video identificato/i sulla sottorete Wi-Fi" },
+    verifiedCameraBadge = "VERIFICATA",
+    suspiciousCameraBadge = "SOSPETTA",
+    quarantineQueueHeader = { count -> "CODA QUARANTENA DISPOSITIVI SCONOSCIUTI ($count)" },
+    allDevicesAuthorizedTitle = "Tutti i dispositivi connessi sono autorizzati",
+    allDevicesAuthorizedSub = "Nessun dispositivo sconosciuto è attualmente attivo sulla sottorete Wi-Fi.",
+    markTrustedBtn = "Segna come Affidabile",
+    markSuspiciousBtn = "Segna Sospetto",
+    watchdogServersHeader = "WATCHDOG 24/7 E MONITORAGGIO UPTIME SERVER",
+    watchdogServersSub = "Avvisa automaticamente se un apparato critico (Router, NAS, Telecamera) va offline",
+    exposedPortsAuditHeader = "AUDIT PORTE APERTE E VULNERABILITÀ LAN",
+    inspectLink = "Ispeziona →",
+    autoAlertPoliciesHeader = "CRITERI DI AVVISO AUTOMATICO DI SICUREZZA",
+    policyUnknownMacTitle = "Avviso Nuovi Dispositivi (MAC Sconosciuto)",
+    policyUnknownMacSub = "Notifica subito quando un indirizzo MAC non registrato riceve un IP via DHCP",
+    policyCriticalPortsTitle = "Rilevamento Porte Critiche (Telnet, RTSP, SMB)",
+    policyCriticalPortsSub = "Avverte se un dispositivo espone servizi non crittografati nella sottorete",
+    policyArpGuardianTitle = "Guardiano ARP e Monitoraggio Continuo",
+    policyArpGuardianSub = "Verifica periodicamente l'integrità MAC del gateway contro attacchi ARP Spoofing",
+    vaultPinGateTitle = "Cronologia Connessioni Protetta",
+    vaultPinGateDescription = "Il registro delle connessioni LAN e le firme SHA-256 dei dispositivi sono protetti tramite PIN o Autenticazione Biometrica per impedire manomissioni.",
+    enterPinLabel = { hint -> "Inserisci Codice PIN (Predefinito: $hint)" },
+    unlockBtn = "Sblocca",
+    biometricUnlockBtn = "Sblocco Biometrico / Impronta Digitale",
+    securedLogHeader = "Registro Connessioni Crittografato (SHA-256)",
+    securedLogSub = { count -> "$count voci firmate crittograficamente nel database locale Room" },
+    exportReportBtn = "Esporta Report",
+    changePinBtn = "Cambia PIN",
+    newPinLabel = "Nuovo PIN (min. 4 cifre)",
+    savedNetworkProfilesHeader = "PROFILI DI RETE SALVATI (CASA / UFFICIO / VIAGGIO)",
+    authorizedDevicesSuffix = "dispositivi autorizzati",
+    filterAllEvents = "Tutti gli Eventi",
+    filterIntrusionEvents = "Avvisi Intrusione",
+    filterConnectedEvents = "Connessioni Dispositivi",
+    filterPortEvents = "Audit Porte",
+    filterTrustEvents = "Autorizzazioni",
+    filterScanEvents = "Scansioni Rete",
+    themeAndDisplaySheetTitle = "Temi, Lingua e Schermo Intero",
+    themeAndDisplaySheetSub = "Personalizza lingua dell'interfaccia, tavolozza colori e modalità immersiva",
+    languageSelectorHeader = "SELEZIONA LINGUA DELL'INTERFACCIA (4 LINGUE)",
+    immersiveFullScreenTitle = "Schermo Intero Immersivo all'Avvio",
+    immersiveFullScreenSub = "Nasconde automaticamente le barre di sistema per il massimo spazio",
+    chooseThemeHeader = "SCEGLI IL TEMA VISIVO (6 TAVOLOZZE DISPONIBILI)"
+)
+
+val GermanStrings = AppStrings(
+    navRadar = "Scanner",
+    navTraffic = "Verkehr",
+    navTools = "Pro-Tools",
+    navAlerts = "Sicherheit",
+    navHistory = "Verlauf",
+    nodesCountLabel = "Knoten",
+    alertsBadgeSuffix = "WARNUNGEN",
+    localIpLabel = "LOKALE IP",
+    gatewayLabel = "GATEWAY",
+    subnetLabel = "SUBNETZ",
+    signalRssiLabel = "RSSI-SIGNAL",
+    linkSpeedLabel = "LINK-TEMPO",
+    interfaceLabel = "INTERFACE",
+    activeDnsPrefix = "Aktiver DNS",
+    encryptionPrefix = "Verschlüsselung",
+    scanNetworkBtn = "LAN-Subnetz scannen",
+    scanningInProgressBtn = "Subnetz wird gescannt…",
+    exactSsidBtn = "Exakte SSID",
+    intrusionBannerTitle = { count -> "Warnung: $count unbekannte Geräte im WLAN" },
+    intrusionBannerSuspiciousBody = { count -> "$count Gerät(e) weisen offene Sicherheitsrisiko-Ports (RTSP/Telnet) auf. Tippen zur Prüfung." },
+    intrusionBannerUnknownBody = "Nicht autorisierte Geräte im lokalen Subnetz erkannt. MAC- und OUI-Signaturen prüfen.",
+    searchPlaceholder = "Suche nach IP, MAC, OUI-Hersteller, OS oder Port (z. B. 554, Apple)…",
+    filterAll = "Alle",
+    filterSuspicious = "Verdächtig",
+    filterUnknown = "Unbekannt",
+    filterTrusted = "Vertraut",
+    sortPrefix = "Sortieren:",
+    connectedDevicesHeader = { count -> "VERBUNDENE GERÄTE IN ECHTZEIT ($count)" },
+    tapForTechnicalInspection = "Für technische Analyse antippen",
+    youBadge = "DU",
+    aboutSubtitle = "Professioneller WLAN- & LAN-Scanner, Sicherheitsaudit & Echtzeit-Telemetrie",
+    editIdentityTitle = "Geräteidentität & Standort anpassen",
+    aliasLabel = "Gerätename (Alias)",
+    roomZoneLabel = "Raum / Physische Zone",
+    technicalNotesLabel = "Technische Notizen / Audit-Bemerkungen",
+    saveBtn = "Speichern",
+    securityAuthSectionTitle = "NETZWERKSICHERHEIT & AUTORISIERUNGSSTATUS",
+    watchdogUptimeTitle = { pct -> "24/7 Uptime-Watchdog ($pct%)" },
+    watchdogUptimeSubtitle = "Sofortige Warnung bei Verbindungsabbruch im LAN",
+    fullHardwareSpecHeader = "VOLLSTÄNDIGE HARDWARE- & NETZWERKSPEZIFIKATION",
+    specIpv4 = "IPv4-Adresse",
+    specIpv6 = "Lokale IPv6-Adresse",
+    specMac = "Physische MAC-Adresse",
+    specVendorOui = "IEEE-OUI-Hersteller",
+    specHostname = "Netzwerk-Hostname (rDNS)",
+    specOsFingerprint = "Betriebssystem-Signatur (OS)",
+    specDhcpType = "IP-Zuweisung / DHCP",
+    specBandSpeed = "Frequenzband & Link-Rate",
+    specSignalPing = "Signalstärke & Ping",
+    specMdns = "mDNS- / Bonjour-Dienste",
+    specCurrentTraffic = "Aktueller & Gesamtverkehr",
+    specFirstSeen = "Erstmals erkannt",
+    specLastSeen = "Letzte Aktivität",
+    openPortsHeader = { count -> "OFFENE TCP/UDP-PORTS ($count)" },
+    openPortsSubtitle = "Freigegebene Netzwerkdienste und erkannte Protokoll-Banner",
+    rescanBtn = "Neu scannen",
+    auditingBtn = "Prüfung…",
+    riskPrefix = "RISIKO",
+    pingJitterBtn = "Ping- & Jitter-Test",
+    wakeOnLanBtn = "Wake-on-LAN",
+    icmpPingTelemetryTitle = "ICMP-PING-TELEMETRIE",
+    minLabel = "MIN",
+    avgLabel = "MITTEL",
+    maxLabel = "MAX",
+    liveDownloadTitle = "LIVE-DOWNLOAD",
+    liveUploadTitle = "LIVE-UPLOAD",
+    peakPrefix = "Spitze",
+    realtimeSubnetTrafficHeader = "SUBNETZ-DATENVERKEHR IN ECHTZEIT",
+    realtimeSubnetTrafficSub = "Kontinuierliche RX/TX-Paketüberwachung (TrafficStats + LAN-Sonden)",
+    sessionTotalPrefix = "Gesamt",
+    downloadLegend = "Download (RX KB/s)",
+    uploadLegend = "Upload (TX KB/s)",
+    protocolDistributionHeader = "DATENVERBRAUCH NACH PROTOKOLL & DIENST",
+    sessionLabel = "Sitzung",
+    wifiSpectrumHeader = "FUNKSPEKTRUM & WLAN-KANALAUSLASTUNG",
+    channelWord = "Kanal",
+    deviceBandwidthRankingHeader = "DATENVERBRAUCH-RANGLISTE NACH GERÄT",
+    toolTabAll = "Alle Tools",
+    toolTabSpeedHeatmap = "SpeedTest & Raum-Heatmap",
+    toolTabTracerouteDns = "Traceroute & DNS",
+    toolTabSubnetCalc = "CIDR-Rechner",
+    dualSpeedTestHeader = "DUAL-SPEEDTEST: INTERNES LAN vs. WAN-INTERNET",
+    dualSpeedTestSub = "Vergleicht die interne WLAN-Linkrate (Telefon↔Router) mit der ISP-Internetbandbreite",
+    wifiLanInternalLabel = "INTERNES WLAN-LAN",
+    wanDownloadLabel = "WAN-DOWNLOAD",
+    wanUploadLabel = "WAN-UPLOAD",
+    startSpeedTestBtn = "SpeedTest starten",
+    measuringSpeedBtn = "Messung läuft…",
+    signalHeatmapHeader = "WLAN-SIGNAL-RAUMKARTE (HEATMAP & MESH-BERATER)",
+    signalHeatmapSub = "Erkennt Funklöcher mit hoher Dämpfung für optimale Mesh-Platzierung",
+    roomNameInputLabel = "Raum- / Zonenname",
+    measureRoomBtn = "Messen",
+    visualTracerouteHeader = "VISUELLER HOP-BY-HOP-TRACEROUTE",
+    visualTracerouteSub = "Verfolgt den Paketpfad vom Gateway über ISP- und IXP-Backbone-Knoten",
+    targetDomainOrIpLabel = "Zieldomain oder IP-Adresse",
+    startRouteBtn = "Route starten",
+    tracingRouteBtn = "Verfolgung…",
+    dnsBenchmarkHeader = "DNS-LOOKUP & RESOLVER-GESCHWINDIGKEITSBENCHMARK",
+    dnsBenchmarkSub = "Vergleicht Antwortzeiten zwischen lokalem Gateway, Cloudflare, Google & Quad9",
+    queriedDomainLabel = "Abgefragte Domain (A/AAAA)",
+    runDnsBenchmarkBtn = "DNS-Benchmark",
+    fastestBadge = "SCHNELLSTER",
+    subnetCalculatorHeader = "IPv4- / CIDR-SUBNETZ- & VLAN-RECHNER",
+    subnetCalculatorSub = "Berechnet Subnetzmaske, Wildcard-ACL, nutzbaren Hostbereich und Broadcast",
+    baseIpv4Label = "Basis-IPv4-Adresse",
+    netIdLabel = "Netzwerkadresse (Network ID)",
+    netmaskLabel = "Subnetzmaske (Netmask)",
+    wildcardMaskLabel = "Wildcard-Maske (ACL)",
+    usableHostRangeLabel = "Nutzbarer Host-IP-Bereich",
+    broadcastAddressLabel = "Broadcast-Adresse",
+    totalUsableHostsLabel = "Nutzbare Hosts gesamt",
+    hostsWord = "Geräte",
+    networkClassLabel = "Netzwerkklasse / Topologie",
+    securityStatusGood = "Netzwerk gut geschützt",
+    securityStatusWarning = "Achtung: Unbekannte Geräte",
+    securityStatusCritical = "Hohes LAN-Eindringrisiko",
+    securitySummaryBody = { unk, risky -> "$unk unbekannte/verdächtige Geräte und $risky Hosts mit offenen Risiko-Ports im WLAN." },
+    testPushNotificationBtn = "Android-Sicherheits-Push-Benachrichtigung testen",
+    arpAndRouterAuditHeader = "ARP-SPOOFING-DETEKTOR (MitM) & ROUTER-AUDIT",
+    arpSpoofingProtectionLabel = "ARP-Spoofing-Schutz",
+    dnsHijackingIntegrityLabel = "DNS-Hijacking-Integrität",
+    exposedRouterPortsLabel = "Offene Router-Admin-Ports",
+    noneWord = "Keine",
+    hiddenCameraDetectorHeader = "DETEKTOR FÜR VERSTECKTE KAMERAS (SPYCAM & RTSP/ONVIF)",
+    hiddenCameraDetectorSub = { count -> "$count Videostreaming-Gerät(e) im WLAN-Subnetz identifiziert" },
+    verifiedCameraBadge = "GEPRÜFT",
+    suspiciousCameraBadge = "VERDÄCHTIG",
+    quarantineQueueHeader = { count -> "QUARANTÄNE-LISTE UNBEKANNTER GERÄTE ($count)" },
+    allDevicesAuthorizedTitle = "Alle verbundenen Geräte sind autorisiert",
+    allDevicesAuthorizedSub = "Derzeit sind keine unbekannten Geräte in Ihrem WLAN-Subnetz aktiv.",
+    markTrustedBtn = "Als vertrauenswürdig markieren",
+    markSuspiciousBtn = "Als verdächtig markieren",
+    watchdogServersHeader = "24/7-WATCHDOG & SERVER-UPTIME-MONITOR",
+    watchdogServersSub = "Warnt automatisch, wenn ein kritisches System (Router, NAS, Kamera) offline geht",
+    exposedPortsAuditHeader = "AUDIT FÜR OFFENE PORTS & LAN-SCHWACHSTELLEN",
+    inspectLink = "Prüfen →",
+    autoAlertPoliciesHeader = "AUTOMATISCHE SICHERHEITSWARNRICHTLINIEN",
+    policyUnknownMacTitle = "Warnung bei neuen Geräten (Unbekannte MAC)",
+    policyUnknownMacSub = "Sofort benachrichtigen, wenn eine unbekannte MAC-Adresse eine DHCP-IP erhält",
+    policyCriticalPortsTitle = "Erkennung kritischer Ports (Telnet, RTSP, SMB)",
+    policyCriticalPortsSub = "Warnen, wenn ein Gerät unverschlüsselte Dienste im Subnetz freigibt",
+    policyArpGuardianTitle = "ARP-Wächter & Dauerüberwachung",
+    policyArpGuardianSub = "Überprüft regelmäßig die Gateway-MAC-Integrität gegen ARP-Spoofing",
+    vaultPinGateTitle = "Gesicherter Verbindungsverlauf",
+    vaultPinGateDescription = "Das LAN-Verbindungsprotokoll und die SHA-256-Gerätesignaturen sind per PIN oder Biometrie geschützt, um unbefugte Manipulationen zu verhindern.",
+    enterPinLabel = { hint -> "Tresor-PIN eingeben (Standard: $hint)" },
+    unlockBtn = "Entsperren",
+    biometricUnlockBtn = "Biometrische Entsperrung / Fingerabdruck",
+    securedLogHeader = "Kryptografisches Verbindungsprotokoll (SHA-256)",
+    securedLogSub = { count -> "$count kryptografisch signierte Einträge in der lokalen Room-Datenbank" },
+    exportReportBtn = "Bericht exportieren",
+    changePinBtn = "PIN ändern",
+    newPinLabel = "Neue PIN (mind. 4 Ziffern)",
+    savedNetworkProfilesHeader = "GESPEICHERTE NETZWERKPROFILE (ZUHAUSE / BÜRO / REISE)",
+    authorizedDevicesSuffix = "autorisierte Geräte",
+    filterAllEvents = "Alle Ereignisse",
+    filterIntrusionEvents = "Eindringwarnungen",
+    filterConnectedEvents = "Geräteverbindungen",
+    filterPortEvents = "Port-Audits",
+    filterTrustEvents = "Autorisierungen",
+    filterScanEvents = "Subnetz-Scans",
+    themeAndDisplaySheetTitle = "Designs, Sprache & Vollbildmodus",
+    themeAndDisplaySheetSub = "Sprache der Oberfläche, Farbschema und immersiven Vollbildmodus anpassen",
+    languageSelectorHeader = "OBERFLÄCHENSPRACHE WÄHLEN (4 SPRACHEN)",
+    immersiveFullScreenTitle = "Immersiver Vollbildmodus beim Start",
+    immersiveFullScreenSub = "Systemleisten automatisch ausblenden für maximalen Telemetrie-Arbeitsbereich",
+    chooseThemeHeader = "VISUELLES DESIGN WÄHLEN (6 FARBPALETTEN VERFÜGBAR)"
+)
+
+fun AppLanguage.toAppStrings(): AppStrings = when (this) {
+    AppLanguage.RO -> RomanianStrings
+    AppLanguage.EN -> EnglishStrings
+    AppLanguage.IT -> ItalianStrings
+    AppLanguage.DE -> GermanStrings
+}
+
+val LocalAppStrings = staticCompositionLocalOf { RomanianStrings }
+val LocalAppLanguage = staticCompositionLocalOf { AppLanguage.RO }

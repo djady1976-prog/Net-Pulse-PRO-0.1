@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.NetworkDeviceEntity
 import com.example.data.RouterArpSecurityAudit
 import com.example.data.TrustStatus
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
@@ -76,6 +77,7 @@ fun SecurityAlertsScreen(
     onTestPushNotification: () -> Unit,
     onInspectDevice: (NetworkDeviceEntity) -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val unknownDevices = devices.filter { it.trustEnum != TrustStatus.TRUSTED }
     val suspiciousCount = devices.count { it.trustEnum == TrustStatus.SUSPICIOUS_FLAGGED }
     val devicesWithRiskyPorts = devices.filter { it.hasHighRiskPorts }
@@ -168,16 +170,16 @@ fun SecurityAlertsScreen(
                         ) {
                             Text(
                                 text = when {
-                                    securityScore >= 85 -> "Rețea Bine Securizată"
-                                    securityScore >= 60 -> "Atenție: Aparate Neautorizate"
-                                    else -> "Risc Ridicat de Intruziune LAN"
+                                    securityScore >= 85 -> strings.securityStatusGood
+                                    securityScore >= 60 -> strings.securityStatusWarning
+                                    else -> strings.securityStatusCritical
                                 },
                                 style = MaterialTheme.typography.titleLarge,
                                 color = scoreColor,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "${unknownDevices.size} dispozitive necunoscute/suspecte și ${devicesWithRiskyPorts.size} aparate cu porturi vulnerabile expuse pe Wi-Fi.",
+                                text = strings.securitySummaryBody(unknownDevices.size, devicesWithRiskyPorts.size),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -193,7 +195,7 @@ fun SecurityAlertsScreen(
                     ) {
                         Icon(Icons.Default.NotificationsActive, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Testează Alerta Push în Bara de Stare Android")
+                        Text(strings.testPushNotificationBtn)
                     }
                 }
             }
@@ -223,7 +225,7 @@ fun SecurityAlertsScreen(
                             modifier = Modifier.size(22.dp)
                         )
                         Text(
-                            text = "DETECTOR ARP SPOOFING (MitM) & AUDIT ROUTER",
+                            text = strings.arpAndRouterAuditHeader,
                             style = MaterialTheme.typography.labelLarge,
                             color = ElectricCyan
                         )
@@ -240,18 +242,18 @@ fun SecurityAlertsScreen(
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             AuditStatusRow(
-                                label = "Protecție ARP Spoofing",
+                                label = strings.arpSpoofingProtectionLabel,
                                 value = routerArpAudit.duplicateMacDetails,
                                 isOk = !routerArpAudit.arpSpoofingDetected
                             )
                             AuditStatusRow(
-                                label = "Integritate DNS Hijacking",
+                                label = strings.dnsHijackingIntegrityLabel,
                                 value = routerArpAudit.dnsIntegrityStatusRo,
                                 isOk = true
                             )
                             AuditStatusRow(
-                                label = "Porturi Admin Router Expuse",
-                                value = if (routerArpAudit.routerAdminExposedPorts.isEmpty()) "Niciunul"
+                                label = strings.exposedRouterPortsLabel,
+                                value = if (routerArpAudit.routerAdminExposedPorts.isEmpty()) strings.noneWord
                                 else routerArpAudit.routerAdminExposedPorts.joinToString(", ") { "TCP:$it" },
                                 isOk = !routerArpAudit.upnpExposed
                             )
@@ -300,12 +302,12 @@ fun SecurityAlertsScreen(
                         )
                         Column {
                             Text(
-                                text = "DETECTOR CAMERE ASCUNSE (SPYCAM & RTSP/ONVIF)",
+                                text = strings.hiddenCameraDetectorHeader,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = CrimsonIntrusion
                             )
                             Text(
-                                text = "${routerArpAudit.spyCamerasDetected.size} dispozitiv(e) video identificat(e) pe subrețeaua Wi-Fi",
+                                text = strings.hiddenCameraDetectorSub(routerArpAudit.spyCamerasDetected.size),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -342,7 +344,7 @@ fun SecurityAlertsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = "Flux: ${cam.mdnsServices} • Upload: ${cam.currentUploadKbps.toInt()} KB/s",
+                                        text = "Stream: ${cam.mdnsServices} • Upload: ${cam.currentUploadKbps.toInt()} KB/s",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = badgeCol
                                     )
@@ -352,7 +354,7 @@ fun SecurityAlertsScreen(
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Text(
-                                        text = if (isAuthorized) "VERIFICATĂ" else "SUSPECTĂ",
+                                        text = if (isAuthorized) strings.verifiedCameraBadge else strings.suspiciousCameraBadge,
                                         style = MaterialTheme.typography.labelSmall,
                                         color = badgeCol,
                                         fontWeight = FontWeight.Bold,
@@ -379,7 +381,7 @@ fun SecurityAlertsScreen(
                     modifier = Modifier.size(22.dp)
                 )
                 Text(
-                    text = "COADĂ CARANTINĂ DISPOZITIVE NECUNOSCUTE (${unknownDevices.size})",
+                    text = strings.quarantineQueueHeader(unknownDevices.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = if (unknownDevices.isEmpty()) CyberEmerald else CrimsonIntrusion
                 )
@@ -408,13 +410,13 @@ fun SecurityAlertsScreen(
                         )
                         Column {
                             Text(
-                                text = "Toate dispozitivele conectate sunt autorizate",
+                                text = strings.allDevicesAuthorizedTitle,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = CyberEmerald,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Niciun aparat necunoscut nu este activ în acest moment pe subrețeaua Wi-Fi.",
+                                text = strings.allDevicesAuthorizedSub,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -496,7 +498,7 @@ fun SecurityAlertsScreen(
                             ) {
                                 Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Marchează De Încredere", style = MaterialTheme.typography.labelMedium)
+                                Text(strings.markTrustedBtn, style = MaterialTheme.typography.labelMedium)
                             }
 
                             if (!isSuspicious) {
@@ -505,7 +507,7 @@ fun SecurityAlertsScreen(
                                     modifier = Modifier.weight(0.8f),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("Marchează Suspect", style = MaterialTheme.typography.labelMedium, color = CrimsonIntrusion)
+                                    Text(strings.markSuspiciousBtn, style = MaterialTheme.typography.labelMedium, color = CrimsonIntrusion)
                                 }
                             }
                         }
@@ -539,12 +541,12 @@ fun SecurityAlertsScreen(
                         )
                         Column {
                             Text(
-                                text = "WATCHDOG 24/7 & MONITORIZARE UPTIME SERVERE",
+                                text = strings.watchdogServersHeader,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = CyberEmerald
                             )
                             Text(
-                                text = "Alertează automat dacă un echipament critic (Router, NAS, Cameră) devine offline",
+                                text = strings.watchdogServersSub,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -598,7 +600,7 @@ fun SecurityAlertsScreen(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "AUDIT PORTURI DESCHISE ȘI VULNERABILITĂȚI LAN",
+                    text = strings.exposedPortsAuditHeader,
                     style = MaterialTheme.typography.labelLarge,
                     color = AmberAlert
                 )
@@ -630,7 +632,7 @@ fun SecurityAlertsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Inspectează →",
+                            text = strings.inspectLink,
                             style = MaterialTheme.typography.labelMedium,
                             color = ElectricCyan
                         )
@@ -654,7 +656,7 @@ fun SecurityAlertsScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
-                                    text = port.riskLevel,
+                                    text = strings.riskLevelName(port.riskLevel),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = riskCol,
                                     fontWeight = FontWeight.Bold
@@ -689,7 +691,7 @@ fun SecurityAlertsScreen(
                             tint = ElectricCyan
                         )
                         Text(
-                            text = "POLITICI DE ALERTARE AUTOMATĂ",
+                            text = strings.autoAlertPoliciesHeader,
                             style = MaterialTheme.typography.labelLarge,
                             color = ElectricCyan
                         )
@@ -697,20 +699,20 @@ fun SecurityAlertsScreen(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
 
                     AlertPolicyToggleRow(
-                        title = "Alertă la Dispozitive Noi (MAC Necunoscut)",
-                        subtitle = "Notifică instant când o adresă MAC neînregistrată primește IP prin DHCP",
+                        title = strings.policyUnknownMacTitle,
+                        subtitle = strings.policyUnknownMacSub,
                         checked = alertOnUnknownDevices,
                         onCheckedChange = onToggleAlertUnknown
                     )
                     AlertPolicyToggleRow(
-                        title = "Detecție Porturi Critice (Telnet, RTSP, SMB)",
-                        subtitle = "Avertizează dacă un dispozitiv expune servicii necriptate în subrețea",
+                        title = strings.policyCriticalPortsTitle,
+                        subtitle = strings.policyCriticalPortsSub,
                         checked = alertOnVulnerablePorts,
                         onCheckedChange = onToggleAlertPorts
                     )
                     AlertPolicyToggleRow(
-                        title = "Gardian ARP & Monitorizare Continuă",
-                        subtitle = "Verifică periodic integritatea adresei MAC a gateway-ului împotriva ARP Spoofing",
+                        title = strings.policyArpGuardianTitle,
+                        subtitle = strings.policyArpGuardianSub,
                         checked = continuousProtectionEnabled,
                         onCheckedChange = onToggleContinuousProtection
                     )

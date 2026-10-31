@@ -62,17 +62,18 @@ import com.example.data.DualSpeedTestResult
 import com.example.data.SignalHeatmapPointEntity
 import com.example.data.SubnetCalculationResult
 import com.example.data.TracerouteHop
+import com.example.ui.i18n.LocalAppStrings
 import com.example.ui.theme.AmberAlert
 import com.example.ui.theme.CrimsonIntrusion
 import com.example.ui.theme.CyberEmerald
 import com.example.ui.theme.ElectricCyan
 import com.example.ui.theme.VioletSpectrum
 
-enum class ProToolSection(val labelRo: String) {
-    ALL("Toate Uneltele"),
-    SPEED_HEATMAP("SpeedTest & Semnal Camere"),
-    TRACEROUTE_DNS("Traceroute & DNS"),
-    SUBNET_CALC("Calculator CIDR")
+enum class ProToolSection {
+    ALL,
+    SPEED_HEATMAP,
+    TRACEROUTE_DNS,
+    SUBNET_CALC
 }
 
 @Composable
@@ -95,6 +96,7 @@ fun ProToolsScreen(
     onRunDnsBenchmark: () -> Unit,
     onUpdateSubnetCalc: (String, Int) -> Unit
 ) {
+    val strings = LocalAppStrings.current
     var activeSection by remember { mutableStateOf(ProToolSection.ALL) }
 
     LazyColumn(
@@ -113,10 +115,16 @@ fun ProToolsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 ProToolSection.entries.forEach { sec ->
+                    val label = when (sec) {
+                        ProToolSection.ALL -> strings.toolTabAll
+                        ProToolSection.SPEED_HEATMAP -> strings.toolTabSpeedHeatmap
+                        ProToolSection.TRACEROUTE_DNS -> strings.toolTabTracerouteDns
+                        ProToolSection.SUBNET_CALC -> strings.toolTabSubnetCalc
+                    }
                     FilterChip(
                         selected = activeSection == sec,
                         onClick = { activeSection = sec },
-                        label = { Text(sec.labelRo) }
+                        label = { Text(label) }
                     )
                 }
             }
@@ -186,6 +194,7 @@ private fun DualSpeedTestCard(
     result: DualSpeedTestResult,
     onStartTest: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,33 +209,26 @@ private fun DualSpeedTestCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Speed,
-                        contentDescription = null,
-                        tint = ElectricCyan,
-                        modifier = Modifier.size(22.dp)
+                Icon(
+                    imageVector = Icons.Default.Speed,
+                    contentDescription = null,
+                    tint = ElectricCyan,
+                    modifier = Modifier.size(22.dp)
+                )
+                Column {
+                    Text(
+                        text = strings.dualSpeedTestHeader,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = ElectricCyan
                     )
-                    Column {
-                        Text(
-                            text = "SPEEDTEST DUAL: LAN INTERN vs. INTERNET WAN",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = ElectricCyan
-                        )
-                        Text(
-                            text = "Separă viteza radio telefon↔router față de viteza conexiunii ISP",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = strings.dualSpeedTestSub,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
@@ -247,26 +249,25 @@ private fun DualSpeedTestCard(
                 color = CyberEmerald
             )
 
-            // 3 Speed Gauges Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SpeedMetricBox(
                     modifier = Modifier.weight(1f),
-                    label = "WI-FI LAN INTERN",
+                    label = strings.wifiLanInternalLabel,
                     mbps = result.lanThroughputMbps,
                     color = ElectricCyan
                 )
                 SpeedMetricBox(
                     modifier = Modifier.weight(1f),
-                    label = "WAN DOWNLOAD",
+                    label = strings.wanDownloadLabel,
                     mbps = result.wanDownloadMbps,
                     color = CyberEmerald
                 )
                 SpeedMetricBox(
                     modifier = Modifier.weight(1f),
-                    label = "WAN UPLOAD",
+                    label = strings.wanUploadLabel,
                     mbps = result.wanUploadMbps,
                     color = VioletSpectrum
                 )
@@ -278,7 +279,7 @@ private fun DualSpeedTestCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Ping: ${result.pingMs} ms • Jitter: ${result.jitterMs} ms • ${result.ratingRo}",
+                    text = "Ping: ${result.pingMs} ms • Jitter: ${result.jitterMs} ms",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
@@ -292,7 +293,7 @@ private fun DualSpeedTestCard(
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (result.isRunning) "Se măsoară…" else "Start SpeedTest")
+                    Text(if (result.isRunning) strings.measuringSpeedBtn else strings.startSpeedTestBtn)
                 }
             }
         }
@@ -344,8 +345,9 @@ private fun WifiSignalHeatmapCard(
     onMeasureRoom: (String) -> Unit,
     onDeletePoint: (Long) -> Unit
 ) {
-    var customRoomName by remember { mutableStateOf("Balcon / Cameră Oaspeți") }
-    val presetRooms = listOf("Living", "Birou", "Dormitor", "Bucătărie", "Terasă", "Subsol")
+    val strings = LocalAppStrings.current
+    var customRoomName by remember { mutableStateOf("Living Room") }
+    val presetRooms = listOf("Living", "Office", "Bedroom", "Kitchen", "Terrace", "Basement")
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -370,19 +372,18 @@ private fun WifiSignalHeatmapCard(
                 )
                 Column {
                     Text(
-                        text = "CARTOGRAFIERE SEMNAL WI-FI PE CAMERE (HEATMAP)",
+                        text = strings.signalHeatmapHeader,
                         style = MaterialTheme.typography.labelLarge,
                         color = CyberEmerald
                     )
                     Text(
-                        text = "Identifică zonele cu atenuare mare care necesită un nod Wi-Fi Mesh",
+                        text = strings.signalHeatmapSub,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Quick Room Chips
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -406,7 +407,7 @@ private fun WifiSignalHeatmapCard(
                 OutlinedTextField(
                     value = customRoomName,
                     onValueChange = { customRoomName = it },
-                    label = { Text("Nume Încăpere / Zonă") },
+                    label = { Text(strings.roomNameInputLabel) },
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -419,11 +420,10 @@ private fun WifiSignalHeatmapCard(
                 ) {
                     Icon(Icons.Default.AddLocationAlt, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Măsoară")
+                    Text(strings.measureRoomBtn)
                 }
             }
 
-            // Heatmap Points List
             points.forEach { pt ->
                 val heatColor = when {
                     pt.rssiDbm >= -55 -> CyberEmerald
@@ -478,7 +478,7 @@ private fun WifiSignalHeatmapCard(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Șterge măsurătoarea",
+                                        contentDescription = "Delete",
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -514,7 +514,8 @@ private fun VisualTracerouteCard(
     onTargetChange: (String) -> Unit,
     onStartTraceroute: () -> Unit
 ) {
-    val quickTargets = listOf("1.1.1.1", "8.8.8.8", "cloudflare.com", "google.ro")
+    val strings = LocalAppStrings.current
+    val quickTargets = listOf("1.1.1.1", "8.8.8.8", "cloudflare.com", "google.com")
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -539,12 +540,12 @@ private fun VisualTracerouteCard(
                 )
                 Column {
                     Text(
-                        text = "TRACEROUTE VIZUAL & ANALIZĂ HOP-BY-HOP",
+                        text = strings.visualTracerouteHeader,
                         style = MaterialTheme.typography.labelLarge,
                         color = ElectricCyan
                     )
                     Text(
-                        text = "Urmărește ruta pachetelor de la Gateway prin nodurile ISP și IXP",
+                        text = strings.visualTracerouteSub,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -577,7 +578,7 @@ private fun VisualTracerouteCard(
                 OutlinedTextField(
                     value = targetHost,
                     onValueChange = onTargetChange,
-                    label = { Text("Domeniu sau IP Destinație") },
+                    label = { Text(strings.targetDomainOrIpLabel) },
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -589,7 +590,7 @@ private fun VisualTracerouteCard(
                         .testTag("run_traceroute_button"),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(if (isRunning) "Traseu…" else "Start Ruta")
+                    Text(if (isRunning) strings.tracingRouteBtn else strings.startRouteBtn)
                 }
             }
 
@@ -662,6 +663,7 @@ private fun DnsBenchmarkCard(
     onDomainChange: (String) -> Unit,
     onRunBenchmark: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val maxTime = (results.maxOfOrNull { it.responseTimeMs } ?: 40).coerceAtLeast(10)
 
     Card(
@@ -687,12 +689,12 @@ private fun DnsBenchmarkCard(
                 )
                 Column {
                     Text(
-                        text = "DNS LOOKUP & BENCHMARK VITEZĂ RESOLVERE",
+                        text = strings.dnsBenchmarkHeader,
                         style = MaterialTheme.typography.labelLarge,
                         color = VioletSpectrum
                     )
                     Text(
-                        text = "Compară timpul de răspuns între DNS-ul local, Cloudflare, Google și Quad9",
+                        text = strings.dnsBenchmarkSub,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -707,7 +709,7 @@ private fun DnsBenchmarkCard(
                 OutlinedTextField(
                     value = domain,
                     onValueChange = onDomainChange,
-                    label = { Text("Domeniu Interogat (A/AAAA)") },
+                    label = { Text(strings.queriedDomainLabel) },
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -719,7 +721,7 @@ private fun DnsBenchmarkCard(
                         .testTag("run_dns_benchmark_button"),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(if (isRunning) "Test…" else "Benchmark DNS")
+                    Text(strings.runDnsBenchmarkBtn)
                 }
             }
 
@@ -757,7 +759,7 @@ private fun DnsBenchmarkCard(
                                         shape = RoundedCornerShape(6.dp)
                                     ) {
                                         Text(
-                                            text = "CEL MAI RAPID",
+                                            text = strings.fastestBadge,
                                             style = MaterialTheme.typography.labelSmall,
                                             color = CyberEmerald,
                                             fontWeight = FontWeight.Bold,
@@ -799,6 +801,7 @@ private fun SubnetCalculatorCard(
     result: SubnetCalculationResult,
     onRecalculate: (String, Int) -> Unit
 ) {
+    val strings = LocalAppStrings.current
     var ipText by remember(result.inputIp) { mutableStateOf(result.inputIp) }
     var prefixSlider by remember(result.cidrPrefix) { mutableFloatStateOf(result.cidrPrefix.toFloat()) }
 
@@ -825,12 +828,12 @@ private fun SubnetCalculatorCard(
                 )
                 Column {
                     Text(
-                        text = "CALCULATOR SUBREȚEA IPv4 / CIDR & VLAN",
+                        text = strings.subnetCalculatorHeader,
                         style = MaterialTheme.typography.labelLarge,
                         color = AmberAlert
                     )
                     Text(
-                        text = "Calculează masca subrețelei, plaja de gazde și adresa de broadcast",
+                        text = strings.subnetCalculatorSub,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -848,7 +851,7 @@ private fun SubnetCalculatorCard(
                         ipText = it
                         onRecalculate(it, prefixSlider.toInt())
                     },
-                    label = { Text("Adresă IPv4 de bază") },
+                    label = { Text(strings.baseIpv4Label) },
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -890,14 +893,14 @@ private fun SubnetCalculatorCard(
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    SubnetRow("Adresă Rețea (Network ID)", "${result.networkAddress}/${result.cidrPrefix}")
-                    SubnetRow("Mască Subrețea (Netmask)", result.subnetMask)
-                    SubnetRow("Mască Wildcard (ACL)", result.wildcardMask)
-                    SubnetRow("Interval Gazde Utilizabile", "${result.firstUsableHost}  →  ${result.lastUsableHost}")
-                    SubnetRow("Adresă Broadcast", result.broadcastAddress)
-                    SubnetRow("Total Gazde (Usable Hosts)", "${result.totalUsableHosts} aparate")
+                    SubnetRow(strings.netIdLabel, "${result.networkAddress}/${result.cidrPrefix}")
+                    SubnetRow(strings.netmaskLabel, result.subnetMask)
+                    SubnetRow(strings.wildcardMaskLabel, result.wildcardMask)
+                    SubnetRow(strings.usableHostRangeLabel, "${result.firstUsableHost}  →  ${result.lastUsableHost}")
+                    SubnetRow(strings.broadcastAddressLabel, result.broadcastAddress)
+                    SubnetRow(strings.totalUsableHostsLabel, "${result.totalUsableHosts} ${strings.hostsWord}")
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-                    SubnetRow("Tipologie / Clasă", result.networkClassRo)
+                    SubnetRow(strings.networkClassLabel, result.networkClassRo)
                 }
             }
         }
