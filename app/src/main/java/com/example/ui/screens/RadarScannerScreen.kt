@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,6 +61,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -68,6 +71,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -75,6 +79,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -82,6 +87,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.R
@@ -165,7 +171,11 @@ fun RadarScannerScreen(
                         .fillMaxWidth()
                         .testTag("device_search_input"),
                     placeholder = {
-                        Text(strings.searchPlaceholder)
+                        Text(
+                            text = strings.searchPlaceholder,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
                     leadingIcon = {
                         Icon(
@@ -295,23 +305,38 @@ fun RadarScannerScreen(
             }
         }
 
-        // 4. Discovered LAN Devices Header
+        // 4. Discovered LAN Devices Header (Symmetrical Left Title + Right Pill)
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = strings.connectedDevicesHeader(filteredDevices.size),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
                 )
-                Text(
-                    text = strings.tapForTechnicalInspection,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = strings.tapForTechnicalInspection,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
 
@@ -351,50 +376,68 @@ fun AboutDeveloperCard(modifier: Modifier = Modifier) {
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
+                .padding(horizontal = 18.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Security,
-                    contentDescription = "About NetPulse Pro",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Security,
+                        contentDescription = "About NetPulse Pro",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
                 Text(
                     text = "ABOUT NETPULSE PRO • v1.0 ENTERPRISE",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
+            }
+
+            Surface(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(10.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    0.8.dp,
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                )
+            ) {
                 Text(
                     text = "CREATED BY: ANDREI ADRIAN BUTA",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = strings.aboutSubtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
+
+            Text(
+                text = strings.aboutSubtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -439,9 +482,9 @@ private fun WifiRadarHeroCard(
                 contentDescription = "Network Radar Hero",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(230.dp),
+                    .height(240.dp),
                 contentScale = ContentScale.Crop,
-                alpha = 0.35f
+                alpha = 0.32f
             )
 
             Column(
@@ -455,7 +498,12 @@ private fun WifiRadarHeroCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -474,17 +522,30 @@ private fun WifiRadarHeroCard(
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "BSSID: ${wifiSnapshot.bssid} • ${wifiSnapshot.bandLabel} (CH ${wifiSnapshot.channelNumber})",
+                            text = "BSSID: ${wifiSnapshot.bssid}",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        Surface(
+                            color = CyberEmerald.copy(alpha = 0.16f),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "${wifiSnapshot.bandLabel} • CH ${wifiSnapshot.channelNumber}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CyberEmerald,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
                     }
 
                     // Animated Live Topology Radar Mini-Canvas
                     Box(
-                        modifier = Modifier.size(92.dp),
+                        modifier = Modifier.size(88.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -557,47 +618,106 @@ private fun WifiRadarHeroCard(
                     }
                 }
 
-                // Technical Subnet Specs Grid
+                // Symmetrical 2x3 Technical Subnet Specs Grid
                 Surface(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
-                    shape = RoundedCornerShape(14.dp)
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
+                    shape = RoundedCornerShape(14.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        0.8.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                    )
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(10.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            TechMetricPill(label = strings.localIpLabel, value = wifiSnapshot.localIpv4)
-                            TechMetricPill(label = strings.gatewayLabel, value = wifiSnapshot.gatewayIp)
-                            TechMetricPill(label = strings.subnetLabel, value = wifiSnapshot.subnetCidr)
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             TechMetricPill(
-                                label = strings.signalRssiLabel,
-                                value = "${wifiSnapshot.rssiDbm} dBm (${wifiSnapshot.signalQualityPercent}%)"
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                label = strings.localIpLabel,
+                                value = wifiSnapshot.localIpv4,
+                                valueColor = ElectricCyan
                             )
                             TechMetricPill(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                label = strings.gatewayLabel,
+                                value = wifiSnapshot.gatewayIp
+                            )
+                            TechMetricPill(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                label = strings.subnetLabel,
+                                value = wifiSnapshot.subnetCidr
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            TechMetricPill(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                label = strings.signalRssiLabel,
+                                value = "${wifiSnapshot.rssiDbm} dBm (${wifiSnapshot.signalQualityPercent}%)",
+                                valueColor = CyberEmerald
+                            )
+                            TechMetricPill(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                                 label = strings.linkSpeedLabel,
                                 value = "${wifiSnapshot.linkSpeedMbps} Mbps"
                             )
                             TechMetricPill(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                                 label = strings.interfaceLabel,
                                 value = "${wifiSnapshot.interfaceName} • MTU ${wifiSnapshot.mtuSize}"
                             )
                         }
-                        Text(
-                            text = "${strings.activeDnsPrefix}: ${wifiSnapshot.dnsServers} • ${strings.encryptionPrefix}: ${wifiSnapshot.securityProtocol}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${strings.activeDnsPrefix}: ${wifiSnapshot.dnsServers}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = "${strings.encryptionPrefix}: ${wifiSnapshot.securityProtocol}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CyberEmerald,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
 
@@ -615,7 +735,9 @@ private fun WifiRadarHeroCard(
                         Text(
                             text = scanStatusText,
                             style = MaterialTheme.typography.labelMedium,
-                            color = ElectricCyan
+                            color = ElectricCyan,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -647,7 +769,9 @@ private fun WifiRadarHeroCard(
                         Text(
                             text = if (isScanning) strings.scanningInProgressBtn else strings.scanNetworkBtn,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -665,7 +789,11 @@ private fun WifiRadarHeroCard(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(strings.exactSsidBtn, style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                text = strings.exactSsidBtn,
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1
+                            )
                         }
                     }
                 }
@@ -675,19 +803,43 @@ private fun WifiRadarHeroCard(
 }
 
 @Composable
-private fun TechMetricPill(label: String, value: String) {
-    Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
-        )
+private fun TechMetricPill(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 7.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelMedium,
+                color = valueColor,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -717,7 +869,7 @@ private fun IntrusionAlertBanner(
         ) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(44.dp)
                     .background(bannerColor.copy(alpha = 0.22f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -728,7 +880,10 @@ private fun IntrusionAlertBanner(
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 Text(
                     text = strings.intrusionBannerTitle(unknownCount),
                     style = MaterialTheme.typography.titleMedium,
@@ -783,13 +938,16 @@ fun NetworkDeviceTechnicalCard(
                 .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            // Card Header Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -806,7 +964,10 @@ fun NetworkDeviceTechnicalCard(
                             modifier = Modifier.size(26.dp)
                         )
                     }
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -817,7 +978,8 @@ fun NetworkDeviceTechnicalCard(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
                             )
                             if (device.isGateway) {
                                 Surface(
@@ -828,6 +990,7 @@ fun NetworkDeviceTechnicalCard(
                                         text = "GATEWAY",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = ElectricCyan,
+                                        fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                     )
                                 }
@@ -840,6 +1003,7 @@ fun NetworkDeviceTechnicalCard(
                                         text = strings.youBadge,
                                         style = MaterialTheme.typography.labelSmall,
                                         color = CyberEmerald,
+                                        fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                     )
                                 }
@@ -865,69 +1029,152 @@ fun NetworkDeviceTechnicalCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = trustColor,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        maxLines = 1,
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp)
                     )
                 }
             }
 
+            // Symmetrical 2x2 Technical Telemetry Grid
             Surface(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
-                shape = RoundedCornerShape(10.dp)
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    0.6.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "IPv4: ${device.ipAddress}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = ElectricCyan,
-                            fontWeight = FontWeight.Bold
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                        ) {
+                            Text(
+                                text = strings.specIpv4,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = device.ipAddress,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = ElectricCyan,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        VerticalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.fillMaxHeight()
                         )
-                        Text(
-                            text = "MAC: ${device.macAddress}",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 10.dp)
+                        ) {
+                            Text(
+                                text = strings.specMac,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = device.macAddress,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "OS: ${device.osFingerprint}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                        ) {
+                            Text(
+                                text = strings.specOsFingerprint,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = device.osFingerprint,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        VerticalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.fillMaxHeight()
                         )
-                        Text(
-                            text = "${device.latencyMs} ms • ${device.signalRssiDbm} dBm",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = if (device.latencyMs <= 12) CyberEmerald else AmberAlert
-                        )
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 10.dp)
+                        ) {
+                            Text(
+                                text = strings.specSignalPing,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "${device.latencyMs} ms • ${device.signalRssiDbm} dBm",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (device.latencyMs <= 12) CyberEmerald else AmberAlert,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
 
+            // Balanced Footer Row: Open Ports Badges (Left) & Live Throughput Pill (Right)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FlowRow(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    device.parsedPorts.take(4).forEach { portInfo ->
+                    device.parsedPorts.take(3).forEach { portInfo ->
                         val portBadgeColor = when (portInfo.riskLevel) {
                             "CRITIC" -> CrimsonIntrusion
                             "MEDIU" -> AmberAlert
@@ -941,27 +1188,34 @@ fun NetworkDeviceTechnicalCard(
                                 text = "${portInfo.port}/${portInfo.serviceName}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = portBadgeColor,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                             )
                         }
                     }
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                Surface(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Speed,
-                        contentDescription = "Live traffic",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Text(
-                        text = "↓${device.currentDownloadKbps.toInt()} ↑${device.currentUploadKbps.toInt()} KB/s",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Speed,
+                            contentDescription = "Live traffic",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = "↓${device.currentDownloadKbps.toInt()} ↑${device.currentUploadKbps.toInt()} KB/s",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }

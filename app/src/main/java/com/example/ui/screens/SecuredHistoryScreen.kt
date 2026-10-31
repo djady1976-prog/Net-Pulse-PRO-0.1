@@ -39,6 +39,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.ConnectionEventEntity
 import com.example.data.NetworkProfileInfo
@@ -135,7 +138,9 @@ fun SecuredHistoryScreen(
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -150,7 +155,7 @@ fun SecuredHistoryScreen(
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = strings.securedLogHeader,
                                     style = MaterialTheme.typography.titleMedium,
@@ -165,21 +170,35 @@ fun SecuredHistoryScreen(
                             }
                         }
 
-                        IconButton(
-                            onClick = onLockVault,
-                            modifier = Modifier.testTag("lock_vault_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Lock Vault",
-                                tint = AmberAlert
+                        Surface(
+                            color = AmberAlert.copy(alpha = 0.16f),
+                            shape = RoundedCornerShape(10.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                0.8.dp,
+                                AmberAlert.copy(alpha = 0.5f)
                             )
+                        ) {
+                            IconButton(
+                                onClick = onLockVault,
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .testTag("lock_vault_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = "Lock Vault",
+                                    tint = AmberAlert,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
 
+                    // Symmetrical Equal-Height Action Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Button(
                             onClick = {
@@ -196,30 +215,56 @@ fun SecuredHistoryScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
+                                .height(46.dp)
                                 .testTag("export_audit_button"),
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(strings.exportReportBtn, style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                text = strings.exportReportBtn,
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
 
                         OutlinedButton(
                             onClick = { showChangePinBox = !showChangePinBox },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(46.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(strings.changePinBtn, style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                text = strings.changePinBtn,
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
 
-                        IconButton(onClick = onClearHistory) {
-                            Icon(
-                                imageVector = Icons.Default.DeleteSweep,
-                                contentDescription = "Clear",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        Surface(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(10.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                0.8.dp,
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                             )
+                        ) {
+                            IconButton(
+                                onClick = onClearHistory,
+                                modifier = Modifier.size(46.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DeleteSweep,
+                                    contentDescription = "Clear",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
 
@@ -227,13 +272,20 @@ fun SecuredHistoryScreen(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.Bottom
                         ) {
                             OutlinedTextField(
                                 value = newPinInput,
                                 onValueChange = { if (it.length <= 6) newPinInput = it.filter(Char::isDigit) },
-                                label = { Text(strings.newPinLabel) },
+                                label = {
+                                    Text(
+                                        text = strings.newPinLabel,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                },
                                 singleLine = true,
+                                shape = RoundedCornerShape(10.dp),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                                 modifier = Modifier.weight(1f)
                             )
@@ -245,7 +297,9 @@ fun SecuredHistoryScreen(
                                         showChangePinBox = false
                                     }
                                 },
-                                enabled = newPinInput.length >= 4
+                                enabled = newPinInput.length >= 4,
+                                modifier = Modifier.height(56.dp),
+                                shape = RoundedCornerShape(10.dp)
                             ) {
                                 Text(strings.saveBtn)
                             }
@@ -258,7 +312,9 @@ fun SecuredHistoryScreen(
         // 2. Saved Multi-Network Profiles (Home / Office / Travel)
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(0.8.dp, ElectricCyan.copy(alpha = 0.35f), RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -292,8 +348,8 @@ fun SecuredHistoryScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onSelectNetworkProfile(profile.profileId) },
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
+                            shape = RoundedCornerShape(12.dp),
                             border = androidx.compose.foundation.BorderStroke(
                                 if (isSelected) 1.2.dp else 0.6.dp,
                                 accent.copy(alpha = 0.6f)
@@ -302,11 +358,16 @@ fun SecuredHistoryScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(10.dp),
+                                    .padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(modifier = Modifier.weight(1f)) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
                                     Text(
                                         text = profile.nameRo,
                                         style = MaterialTheme.typography.titleMedium,
@@ -321,14 +382,16 @@ fun SecuredHistoryScreen(
                                     Text(
                                         text = profile.securityModeRo,
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = if (isSelected) CyberEmerald else ElectricCyan
+                                        color = if (isSelected) CyberEmerald else ElectricCyan,
+                                        fontWeight = FontWeight.Medium
                                     )
                                 }
                                 if (isSelected) {
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
                                         contentDescription = "Active",
-                                        tint = CyberEmerald
+                                        tint = CyberEmerald,
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
                             }
@@ -420,24 +483,45 @@ fun SecuredHistoryScreen(
                     )
 
                     Surface(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
-                        shape = RoundedCornerShape(8.dp)
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
+                        shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            0.6.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(
-                                text = "Host: ${event.deviceName} | IP: ${event.deviceIp} | MAC: ${event.deviceMac}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Host: ${event.deviceName}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "${event.deviceIp} • ${event.deviceMac}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = ElectricCyan,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             Text(
                                 text = "SIG-SHA256: ${event.sha256Signature}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = CyberEmerald
+                                color = CyberEmerald,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -500,13 +584,17 @@ private fun VaultPinLockGate(
                     text = strings.vaultPinGateTitle,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Text(
                     text = strings.vaultPinGateDescription,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
@@ -520,6 +608,7 @@ private fun VaultPinLockGate(
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("vault_pin_input")
@@ -529,13 +618,15 @@ private fun VaultPinLockGate(
                     Text(
                         text = authError,
                         style = MaterialTheme.typography.labelMedium,
-                        color = CrimsonIntrusion
+                        color = CrimsonIntrusion,
+                        textAlign = TextAlign.Center
                     )
                 }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
                         onClick = { onUnlockAttempt(pinInput) },
@@ -548,7 +639,12 @@ private fun VaultPinLockGate(
                     ) {
                         Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(strings.unlockBtn, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = strings.unlockBtn,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
 
                     OutlinedButton(
@@ -557,11 +653,16 @@ private fun VaultPinLockGate(
                             onUnlockAttempt(pinHint)
                         },
                         modifier = Modifier
+                            .weight(0.75f)
                             .height(48.dp)
                             .testTag("vault_quick_unlock_button"),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("PIN $pinHint", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            text = "PIN $pinHint",
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1
+                        )
                     }
                 }
 
@@ -583,7 +684,9 @@ private fun VaultPinLockGate(
                     Text(
                         text = strings.biometricUnlockBtn,
                         style = MaterialTheme.typography.labelLarge,
-                        color = CyberEmerald
+                        color = CyberEmerald,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

@@ -2,12 +2,16 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,7 +35,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,8 +54,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.NetworkDeviceEntity
 import com.example.data.PingDiagnosticResult
@@ -112,24 +118,38 @@ fun DeviceInspectorSheet(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
                 ) {
-                    Icon(
-                        imageVector = categoryIcon(device.categoryEnum),
-                        contentDescription = null,
-                        tint = ElectricCyan,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Column {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .background(ElectricCyan.copy(alpha = 0.14f), RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = categoryIcon(device.categoryEnum),
+                            contentDescription = null,
+                            tint = ElectricCyan,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = device.displayName,
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "${strings.categoryName(device.categoryEnum)} • ${device.vendorOui}",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -163,6 +183,7 @@ fun DeviceInspectorSheet(
                         Text(
                             text = strings.editIdentityTitle,
                             style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                             color = ElectricCyan
                         )
                         OutlinedTextField(
@@ -170,6 +191,7 @@ fun DeviceInspectorSheet(
                             onValueChange = { aliasInput = it },
                             label = { Text(strings.aliasLabel) },
                             singleLine = true,
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
@@ -177,12 +199,14 @@ fun DeviceInspectorSheet(
                             onValueChange = { roomInput = it },
                             label = { Text(strings.roomZoneLabel) },
                             singleLine = true,
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedTextField(
                             value = notesInput,
                             onValueChange = { notesInput = it },
                             label = { Text(strings.technicalNotesLabel) },
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Button(
@@ -190,7 +214,8 @@ fun DeviceInspectorSheet(
                                 onSaveIdentity(aliasInput, roomInput, notesInput)
                                 isEditingIdentity = false
                             },
-                            modifier = Modifier.align(Alignment.End)
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp)
                         ) {
                             Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
@@ -200,15 +225,17 @@ fun DeviceInspectorSheet(
                 }
             }
 
-            // Trust Status Selector + Watchdog Toggle
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Symmetrical 3-Column Trust Status Selector + Watchdog Toggle
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     text = strings.securityAuthSectionTitle,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TrustStatus.entries.forEach { status ->
@@ -218,11 +245,25 @@ fun DeviceInspectorSheet(
                             TrustStatus.UNKNOWN_NEW -> AmberAlert
                             TrustStatus.SUSPICIOUS_FLAGGED -> CrimsonIntrusion
                         }
-                        FilterChip(
-                            selected = selected,
-                            onClick = { onUpdateTrust(status) },
-                            label = { Text(strings.trustName(status), style = MaterialTheme.typography.labelMedium) },
-                            leadingIcon = {
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clickable { onUpdateTrust(status) },
+                            color = if (selected) chipColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(10.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                width = if (selected) 1.4.dp else 0.8.dp,
+                                color = if (selected) chipColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 6.dp, vertical = 10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                            ) {
                                 Icon(
                                     imageVector = when (status) {
                                         TrustStatus.TRUSTED -> Icons.Default.CheckCircle
@@ -231,16 +272,29 @@ fun DeviceInspectorSheet(
                                     },
                                     contentDescription = null,
                                     tint = chipColor,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Text(
+                                    text = strings.trustName(status),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (selected) chipColor else MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center
                                 )
                             }
-                        )
+                        }
                     }
                 }
 
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        0.8.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                    )
                 ) {
                     Row(
                         modifier = Modifier
@@ -252,7 +306,9 @@ fun DeviceInspectorSheet(
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 10.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MonitorHeart,
@@ -263,6 +319,7 @@ fun DeviceInspectorSheet(
                                 Text(
                                     text = strings.watchdogUptimeTitle("%.2f".format(device.uptimePercent)),
                                     style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
@@ -280,10 +337,14 @@ fun DeviceInspectorSheet(
                 }
             }
 
-            // Full Technical Specification Matrix
+            // Full Technical Specification Matrix (Symmetrical Left-Label / Right-Value Table)
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    0.8.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -297,21 +358,37 @@ fun DeviceInspectorSheet(
                         color = ElectricCyan
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-                    SpecRow(strings.specIpv4, device.ipAddress)
+                    SpecRow(strings.specIpv4, device.ipAddress, ElectricCyan)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specIpv6, device.ipv6Address)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specMac, device.macAddress)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specVendorOui, device.vendorOui)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specHostname, device.hostname)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specOsFingerprint, device.osFingerprint)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specDhcpType, device.dhcpType)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specBandSpeed, "${device.frequencyBand} • ${device.linkSpeedMbps} Mbps")
-                    SpecRow(strings.specSignalPing, "${device.signalRssiDbm} dBm • ${device.latencyMs} ms (TTL ${device.ttl})")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
+                    SpecRow(
+                        strings.specSignalPing,
+                        "${device.signalRssiDbm} dBm • ${device.latencyMs} ms (TTL ${device.ttl})",
+                        CyberEmerald
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specMdns, device.mdnsServices)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(
                         strings.specCurrentTraffic,
-                        "↓ ${device.currentDownloadKbps.toInt()} KB/s | ↑ ${device.currentUploadKbps.toInt()} KB/s • ${"%.1f".format(device.sessionTrafficMb)} MB"
+                        "↓ ${device.currentDownloadKbps.toInt()} | ↑ ${device.currentUploadKbps.toInt()} KB/s (${"%.1f".format(device.sessionTrafficMb)} MB)"
                     )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specFirstSeen, sdf.format(Date(device.firstSeenEpochMs)))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
                     SpecRow(strings.specLastSeen, sdf.format(Date(device.lastSeenEpochMs)))
                 }
             }
@@ -319,7 +396,11 @@ fun DeviceInspectorSheet(
             // Open Ports & Security Audit Section
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    0.8.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -332,7 +413,11 @@ fun DeviceInspectorSheet(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                        ) {
                             Text(
                                 text = strings.openPortsHeader(device.parsedPorts.size),
                                 style = MaterialTheme.typography.labelLarge,
@@ -347,11 +432,15 @@ fun DeviceInspectorSheet(
                         OutlinedButton(
                             onClick = onRunPortAudit,
                             enabled = !isPortAuditRunning,
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.testTag("deep_port_scan_button")
                         ) {
                             Icon(Icons.Default.Security, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(if (isPortAuditRunning) strings.auditingBtn else strings.rescanBtn)
+                            Text(
+                                text = if (isPortAuditRunning) strings.auditingBtn else strings.rescanBtn,
+                                maxLines = 1
+                            )
                         }
                     }
 
@@ -372,14 +461,18 @@ fun DeviceInspectorSheet(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
                                     RoundedCornerShape(10.dp)
                                 )
                                 .padding(10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
+                            ) {
                                 Text(
                                     text = "Port ${portInfo.port}/${portInfo.protocol} • ${portInfo.serviceName}",
                                     style = MaterialTheme.typography.labelLarge,
@@ -409,7 +502,7 @@ fun DeviceInspectorSheet(
                 }
             }
 
-            // Live Diagnostic Tools: Ping & Wake-on-LAN
+            // Live Diagnostic Tools: Symmetrical 50/50 Ping & Wake-on-LAN Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -427,7 +520,12 @@ fun DeviceInspectorSheet(
                 ) {
                     Icon(Icons.Default.NetworkPing, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(strings.pingJitterBtn, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = strings.pingJitterBtn,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 OutlinedButton(
@@ -440,11 +538,16 @@ fun DeviceInspectorSheet(
                 ) {
                     Icon(Icons.Default.PowerSettingsNew, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(strings.wakeOnLanBtn, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = strings.wakeOnLanBtn,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
-            // Live Ping Results Panel if active
+            // Live Ping Results Panel if active (Symmetrical 4-Column Metric Grid)
             if (pingResult != null) {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
@@ -457,7 +560,7 @@ fun DeviceInspectorSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -482,15 +585,36 @@ fun DeviceInspectorSheet(
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("${strings.minLabel}: ${pingResult.minMs} ms", style = MaterialTheme.typography.labelMedium, color = CyberEmerald)
-                            Text("${strings.avgLabel}: ${pingResult.avgMs} ms", style = MaterialTheme.typography.labelMedium, color = ElectricCyan)
-                            Text("${strings.maxLabel}: ${pingResult.maxMs} ms", style = MaterialTheme.typography.labelMedium, color = AmberAlert)
-                            Text("JITTER: ${pingResult.jitterMs} ms", style = MaterialTheme.typography.labelMedium)
+                            PingStatPill(
+                                modifier = Modifier.weight(1f),
+                                label = strings.minLabel,
+                                value = "${pingResult.minMs} ms",
+                                color = CyberEmerald
+                            )
+                            PingStatPill(
+                                modifier = Modifier.weight(1f),
+                                label = strings.avgLabel,
+                                value = "${pingResult.avgMs} ms",
+                                color = ElectricCyan
+                            )
+                            PingStatPill(
+                                modifier = Modifier.weight(1f),
+                                label = strings.maxLabel,
+                                value = "${pingResult.maxMs} ms",
+                                color = AmberAlert
+                            )
+                            PingStatPill(
+                                modifier = Modifier.weight(1f),
+                                label = "JITTER",
+                                value = "${pingResult.jitterMs} ms",
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
                         FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             pingResult.samplesMs.forEachIndexed { i, ms ->
                                 Surface(
@@ -516,24 +640,66 @@ fun DeviceInspectorSheet(
 }
 
 @Composable
-private fun SpecRow(label: String, value: String) {
+private fun PingStatPill(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    color: Color
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelMedium,
+                color = color,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpecRow(
+    label: String,
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(0.42f)
+            modifier = Modifier
+                .weight(0.45f)
+                .padding(end = 8.dp)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(0.58f)
+            color = valueColor,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(0.55f)
         )
     }
 }

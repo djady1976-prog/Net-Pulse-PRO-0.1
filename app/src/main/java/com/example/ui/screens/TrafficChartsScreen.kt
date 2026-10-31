@@ -7,9 +7,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.NetworkDeviceEntity
@@ -84,14 +87,18 @@ fun TrafficChartsScreen(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 1. Live Throughput KPI Cards
+        // 1. Symmetrical Equal-Height Live Throughput KPI Cards
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ThroughputKpiCard(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     title = strings.liveDownloadTitle,
                     value = "${"%.1f".format(currentDownMbps)} Mbps",
                     subtitle = "${(latest?.downloadKbps ?: 0f).toInt()} KB/s • ${strings.peakPrefix} ${"%.1f".format(peakDownMbps)} Mbps",
@@ -99,7 +106,9 @@ fun TrafficChartsScreen(
                     icon = Icons.Default.ArrowDownward
                 )
                 ThroughputKpiCard(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     title = strings.liveUploadTitle,
                     value = "${"%.1f".format(currentUpMbps)} Mbps",
                     subtitle = "${(latest?.uploadKbps ?: 0f).toInt()} KB/s • ${latest?.packetsPerSec ?: 420} pkt/s",
@@ -133,37 +142,61 @@ fun TrafficChartsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
                             Text(
                                 text = strings.realtimeSubnetTrafficHeader,
                                 style = MaterialTheme.typography.labelLarge,
-                                color = ElectricCyan
+                                color = ElectricCyan,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = strings.realtimeSubnetTrafficSub,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                         Surface(
                             color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                0.8.dp,
+                                CyberEmerald.copy(alpha = 0.4f)
+                            )
                         ) {
                             Text(
                                 text = "${strings.sessionTotalPrefix}: ${"%.2f".format(totalSessionGb)} GB",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = CyberEmerald,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                             )
                         }
                     }
 
+                    // Symmetrical 2-Column Legend Bar
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        LegendIndicator(color = ElectricCyan, label = strings.downloadLegend)
-                        LegendIndicator(color = CyberEmerald, label = strings.uploadLegend)
+                        LegendIndicator(
+                            modifier = Modifier.weight(1f),
+                            color = ElectricCyan,
+                            label = strings.downloadLegend
+                        )
+                        LegendIndicator(
+                            modifier = Modifier.weight(1f),
+                            color = CyberEmerald,
+                            label = strings.uploadLegend
+                        )
                     }
 
                     LiveTrafficAreaCanvas(
@@ -179,7 +212,13 @@ fun TrafficChartsScreen(
         // 3. Protocol & Service Traffic Distribution Donut Chart
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        0.8.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                        RoundedCornerShape(18.dp)
+                    ),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -202,7 +241,9 @@ fun TrafficChartsScreen(
                         Text(
                             text = strings.protocolDistributionHeader,
                             style = MaterialTheme.typography.labelLarge,
-                            color = ElectricCyan
+                            color = ElectricCyan,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -220,11 +261,11 @@ fun TrafficChartsScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Box(
-                            modifier = Modifier.size(130.dp),
+                            modifier = Modifier.size(126.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Canvas(modifier = Modifier.fillMaxSize()) {
-                                val strokeWidth = 22.dp.toPx()
+                                val strokeWidth = 20.dp.toPx()
                                 val diameter = size.minDimension - strokeWidth
                                 val topLeft = Offset(strokeWidth / 2f, strokeWidth / 2f)
                                 var startAngle = -90f
@@ -247,12 +288,14 @@ fun TrafficChartsScreen(
                                     text = "${"%.1f".format(totalSessionGb)} GB",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     text = strings.sessionLabel,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -263,44 +306,59 @@ fun TrafficChartsScreen(
                         ) {
                             protocolShares.forEachIndexed { idx, share ->
                                 val c = sliceColors[idx % sliceColors.size]
-                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                Surface(
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                                        verticalArrangement = Arrangement.spacedBy(3.dp)
                                     ) {
                                         Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Box(
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp),
                                                 modifier = Modifier
-                                                    .size(10.dp)
-                                                    .background(c, CircleShape)
-                                            )
+                                                    .weight(1f)
+                                                    .padding(end = 6.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(9.dp)
+                                                        .background(c, CircleShape)
+                                                )
+                                                Text(
+                                                    text = share.protocolName,
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    fontWeight = FontWeight.Bold,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
                                             Text(
-                                                text = share.protocolName,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
+                                                text = "${(share.percentage * 100).toInt()}% • ${"%.0f".format(share.megabytesTotal)} MB",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = c,
+                                                fontWeight = FontWeight.Bold
                                             )
                                         }
-                                        Text(
-                                            text = "${(share.percentage * 100).toInt()}%",
-                                            style = MaterialTheme.typography.labelMedium,
+                                        LinearProgressIndicator(
+                                            progress = { share.percentage.coerceIn(0.05f, 1f) },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(4.dp)
+                                                .clip(RoundedCornerShape(2.dp)),
                                             color = c,
-                                            fontWeight = FontWeight.Bold
+                                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                                         )
                                     }
-                                    Text(
-                                        text = "${"%.0f".format(share.megabytesTotal)} MB • ${share.descriptionRo}",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
                                 }
                             }
                         }
@@ -312,7 +370,13 @@ fun TrafficChartsScreen(
         // 4. Wi-Fi Channel Spectrum & SNR Curve
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        0.8.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                        RoundedCornerShape(18.dp)
+                    ),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -387,7 +451,12 @@ fun TrafficChartsScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onDeviceClick(device) },
+                    .clickable { onDeviceClick(device) }
+                    .border(
+                        0.8.dp,
+                        barColor.copy(alpha = 0.3f),
+                        RoundedCornerShape(14.dp)
+                    ),
                 shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -402,7 +471,11 @@ fun TrafficChartsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 10.dp)
+                        ) {
                             Text(
                                 text = device.displayName,
                                 style = MaterialTheme.typography.titleMedium,
@@ -414,15 +487,23 @@ fun TrafficChartsScreen(
                             Text(
                                 text = "${device.ipAddress} • ↓ ${device.currentDownloadKbps.toInt()} KB/s | ↑ ${device.currentUploadKbps.toInt()} KB/s",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
-                        Text(
-                            text = "${"%.1f".format(device.sessionTrafficMb)} MB",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = barColor,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Surface(
+                            color = barColor.copy(alpha = 0.14f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "${"%.1f".format(device.sessionTrafficMb)} MB",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = barColor,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                            )
+                        }
                     }
 
                     LinearProgressIndicator(
@@ -456,7 +537,7 @@ private fun ThroughputKpiCard(
     Card(
         modifier = modifier.border(
             1.dp,
-            accentColor.copy(alpha = 0.35f),
+            accentColor.copy(alpha = 0.38f),
             RoundedCornerShape(16.dp)
         ),
         shape = RoundedCornerShape(16.dp),
@@ -464,9 +545,10 @@ private fun ThroughputKpiCard(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -482,42 +564,64 @@ private fun ThroughputKpiCard(
                     text = title,
                     style = MaterialTheme.typography.labelMedium,
                     color = accentColor,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
                 text = value,
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
 @Composable
-private fun LegendIndicator(color: Color, label: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+private fun LegendIndicator(
+    modifier: Modifier = Modifier,
+    color: Color,
+    label: String
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(10.dp)
-                .background(color, CircleShape)
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .background(color, CircleShape)
+            )
+            Spacer(modifier = Modifier.size(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 

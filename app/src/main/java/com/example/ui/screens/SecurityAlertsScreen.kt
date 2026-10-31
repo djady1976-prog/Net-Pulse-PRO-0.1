@@ -51,6 +51,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.NetworkDeviceEntity
 import com.example.data.RouterArpSecurityAudit
@@ -114,12 +116,12 @@ fun SecurityAlertsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(18.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Box(
                             modifier = Modifier.size(96.dp),
@@ -154,12 +156,14 @@ fun SecurityAlertsScreen(
                                     text = "$securityScore",
                                     style = MaterialTheme.typography.headlineLarge,
                                     color = scoreColor,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     text = "/ 100",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -190,12 +194,17 @@ fun SecurityAlertsScreen(
                         onClick = onTestPushNotification,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(46.dp)
                             .testTag("test_push_notification_button"),
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Icon(Icons.Default.NotificationsActive, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(strings.testPushNotificationBtn)
+                        Text(
+                            text = strings.testPushNotificationBtn,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
@@ -204,7 +213,9 @@ fun SecurityAlertsScreen(
         // 2. Active Router, DNS Hijacking & ARP Spoofing Detector Card
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(0.8.dp, ElectricCyan.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -212,45 +223,59 @@ fun SecurityAlertsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Router,
-                            contentDescription = null,
-                            tint = ElectricCyan,
-                            modifier = Modifier.size(22.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(ElectricCyan.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Router,
+                                contentDescription = null,
+                                tint = ElectricCyan,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
                         Text(
                             text = strings.arpAndRouterAuditHeader,
                             style = MaterialTheme.typography.labelLarge,
-                            color = ElectricCyan
+                            color = ElectricCyan,
+                            modifier = Modifier.weight(1f)
                         )
                     }
 
                     Surface(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                        shape = RoundedCornerShape(12.dp)
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.84f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            0.6.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             AuditStatusRow(
                                 label = strings.arpSpoofingProtectionLabel,
                                 value = routerArpAudit.duplicateMacDetails,
                                 isOk = !routerArpAudit.arpSpoofingDetected
                             )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             AuditStatusRow(
                                 label = strings.dnsHijackingIntegrityLabel,
                                 value = routerArpAudit.dnsIntegrityStatusRo,
                                 isOk = true
                             )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                             AuditStatusRow(
                                 label = strings.exposedRouterPortsLabel,
                                 value = if (routerArpAudit.routerAdminExposedPorts.isEmpty()) strings.noneWord
@@ -288,19 +313,26 @@ fun SecurityAlertsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CameraAlt,
-                            contentDescription = null,
-                            tint = CrimsonIntrusion,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Column {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(CrimsonIntrusion.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                tint = CrimsonIntrusion,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = strings.hiddenCameraDetectorHeader,
                                 style = MaterialTheme.typography.labelLarge,
@@ -322,7 +354,11 @@ fun SecurityAlertsScreen(
                                 .fillMaxWidth()
                                 .clickable { onInspectDevice(cam) },
                             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                0.6.dp,
+                                badgeCol.copy(alpha = 0.4f)
+                            )
                         ) {
                             Row(
                                 modifier = Modifier
@@ -331,22 +367,33 @@ fun SecurityAlertsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(modifier = Modifier.weight(1f)) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
                                     Text(
                                         text = "${cam.displayName} (${cam.ipAddress})",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                     Text(
                                         text = "MAC: ${cam.macAddress} • ${cam.vendorOui}",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                     Text(
                                         text = "Stream: ${cam.mdnsServices} • Upload: ${cam.currentUploadKbps.toInt()} KB/s",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = badgeCol
+                                        color = badgeCol,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
                                 Surface(
@@ -408,7 +455,7 @@ fun SecurityAlertsScreen(
                             tint = CyberEmerald,
                             modifier = Modifier.size(32.dp)
                         )
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = strings.allDevicesAuthorizedTitle,
                                 style = MaterialTheme.typography.titleMedium,
@@ -449,7 +496,7 @@ fun SecurityAlertsScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(40.dp)
+                                    .size(42.dp)
                                     .background(accent.copy(alpha = 0.18f), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -460,17 +507,21 @@ fun SecurityAlertsScreen(
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "${device.displayName} (${device.ipAddress})",
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = "MAC: ${device.macAddress} • ${device.vendorOui}",
                                     style = MaterialTheme.typography.labelMedium,
-                                    color = accent
+                                    color = accent,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -481,14 +532,17 @@ fun SecurityAlertsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
 
+                        // Symmetrical 50% / 50% Equal-Width Action Buttons
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
                                 onClick = { onAuthorizeDevice(device) },
                                 modifier = Modifier
                                     .weight(1f)
+                                    .height(46.dp)
                                     .testTag("authorize_${device.ipAddress}"),
                                 shape = RoundedCornerShape(10.dp),
                                 colors = ButtonDefaults.buttonColors(
@@ -498,16 +552,35 @@ fun SecurityAlertsScreen(
                             ) {
                                 Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(strings.markTrustedBtn, style = MaterialTheme.typography.labelMedium)
+                                Text(
+                                    text = strings.markTrustedBtn,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
 
                             if (!isSuspicious) {
                                 OutlinedButton(
                                     onClick = { onFlagDeviceSuspicious(device) },
-                                    modifier = Modifier.weight(0.8f),
-                                    shape = RoundedCornerShape(10.dp)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(46.dp),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        1.dp,
+                                        CrimsonIntrusion.copy(alpha = 0.65f)
+                                    )
                                 ) {
-                                    Text(strings.markSuspiciousBtn, style = MaterialTheme.typography.labelMedium, color = CrimsonIntrusion)
+                                    Text(
+                                        text = strings.markSuspiciousBtn,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = CrimsonIntrusion,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             }
                         }
@@ -519,7 +592,9 @@ fun SecurityAlertsScreen(
         // 5. Watchdog 24/7 Uptime Monitor for Critical Hosts
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(0.8.dp, CyberEmerald.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -531,15 +606,22 @@ fun SecurityAlertsScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.MonitorHeart,
-                            contentDescription = null,
-                            tint = CyberEmerald,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Column {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(CyberEmerald.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MonitorHeart,
+                                contentDescription = null,
+                                tint = CyberEmerald,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = strings.watchdogServersHeader,
                                 style = MaterialTheme.typography.labelLarge,
@@ -558,18 +640,24 @@ fun SecurityAlertsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
                                     RoundedCornerShape(10.dp)
                                 )
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 10.dp)
+                            ) {
                                 Text(
                                     text = "${dev.displayName} (${dev.ipAddress})",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = "Uptime: ${"%.2f".format(dev.uptimePercent)}% • Ping ${dev.latencyMs} ms",
@@ -619,22 +707,29 @@ fun SecurityAlertsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "${dev.displayName} (${dev.ipAddress})",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         )
                         Text(
                             text = strings.inspectLink,
                             style = MaterialTheme.typography.labelMedium,
-                            color = ElectricCyan
+                            color = ElectricCyan,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     dev.parsedPorts.filter { it.riskLevel != "SCĂZUT" }.forEach { port ->
@@ -645,7 +740,7 @@ fun SecurityAlertsScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(8.dp),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -653,14 +748,22 @@ fun SecurityAlertsScreen(
                                     text = "Port ${port.port}/${port.serviceName}: ${port.banner}",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp)
                                 )
-                                Text(
-                                    text = strings.riskLevelName(port.riskLevel),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = riskCol,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Surface(
+                                    color = riskCol.copy(alpha = 0.18f),
+                                    shape = RoundedCornerShape(6.dp)
+                                ) {
+                                    Text(
+                                        text = strings.riskLevelName(port.riskLevel),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = riskCol,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -704,12 +807,14 @@ fun SecurityAlertsScreen(
                         checked = alertOnUnknownDevices,
                         onCheckedChange = onToggleAlertUnknown
                     )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     AlertPolicyToggleRow(
                         title = strings.policyCriticalPortsTitle,
                         subtitle = strings.policyCriticalPortsSub,
                         checked = alertOnVulnerablePorts,
                         onCheckedChange = onToggleAlertPorts
                     )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     AlertPolicyToggleRow(
                         title = strings.policyArpGuardianTitle,
                         subtitle = strings.policyArpGuardianSub,
@@ -741,14 +846,17 @@ private fun AuditStatusRow(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(0.42f)
+            modifier = Modifier
+                .weight(0.45f)
+                .padding(end = 8.dp)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.labelMedium,
             color = if (isOk) CyberEmerald else AmberAlert,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(0.58f)
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(0.55f)
         )
     }
 }
@@ -769,7 +877,8 @@ private fun AlertPolicyToggleRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
             )
             Text(
                 text = subtitle,

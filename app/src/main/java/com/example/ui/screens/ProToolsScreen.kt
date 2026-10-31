@@ -6,9 +6,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -55,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.DnsServerBenchmarkResult
@@ -210,15 +213,22 @@ private fun DualSpeedTestCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Speed,
-                    contentDescription = null,
-                    tint = ElectricCyan,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(ElectricCyan.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Speed,
+                        contentDescription = null,
+                        tint = ElectricCyan,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = strings.dualSpeedTestHeader,
                         style = MaterialTheme.typography.labelLarge,
@@ -243,30 +253,48 @@ private fun DualSpeedTestCard(
                 )
             }
 
-            Text(
-                text = result.phaseLabel,
-                style = MaterialTheme.typography.labelMedium,
-                color = CyberEmerald
-            )
+            Surface(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.65f),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = result.phaseLabel,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = CyberEmerald,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                )
+            }
 
+            // Symmetrical Equal-Height 3-Column Speed Metric Grid
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SpeedMetricBox(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     label = strings.wifiLanInternalLabel,
                     mbps = result.lanThroughputMbps,
                     color = ElectricCyan
                 )
                 SpeedMetricBox(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     label = strings.wanDownloadLabel,
                     mbps = result.wanDownloadMbps,
                     color = CyberEmerald
                 )
                 SpeedMetricBox(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     label = strings.wanUploadLabel,
                     mbps = result.wanUploadMbps,
                     color = VioletSpectrum
@@ -278,22 +306,39 @@ private fun DualSpeedTestCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Ping: ${result.pingMs} ms • Jitter: ${result.jitterMs} ms",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f)
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 10.dp)
+                ) {
+                    Text(
+                        text = "Ping: ${result.pingMs} ms  •  Jitter: ${result.jitterMs} ms",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 12.dp)
+                    )
+                }
                 Button(
                     onClick = onStartTest,
                     enabled = !result.isRunning,
-                    modifier = Modifier.testTag("start_dual_speedtest_button"),
+                    modifier = Modifier
+                        .height(44.dp)
+                        .testTag("start_dual_speedtest_button"),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (result.isRunning) strings.measuringSpeedBtn else strings.startSpeedTestBtn)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = if (result.isRunning) strings.measuringSpeedBtn else strings.startSpeedTestBtn,
+                        maxLines = 1
+                    )
                 }
             }
         }
@@ -309,31 +354,38 @@ private fun SpeedMetricBox(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
-        shape = RoundedCornerShape(12.dp)
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(0.8.dp, color.copy(alpha = 0.35f))
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = "${mbps.toInt()}",
                 style = MaterialTheme.typography.headlineMedium,
                 color = color,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = "Mbps",
                 style = MaterialTheme.typography.labelSmall,
-                color = color
+                color = color,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -350,7 +402,9 @@ private fun WifiSignalHeatmapCard(
     val presetRooms = listOf("Living", "Office", "Bedroom", "Kitchen", "Terrace", "Basement")
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(0.8.dp, CyberEmerald.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -362,15 +416,22 @@ private fun WifiSignalHeatmapCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.WifiTethering,
-                    contentDescription = null,
-                    tint = CyberEmerald,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(CyberEmerald.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WifiTethering,
+                        contentDescription = null,
+                        tint = CyberEmerald,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = strings.signalHeatmapHeader,
                         style = MaterialTheme.typography.labelLarge,
@@ -399,28 +460,36 @@ private fun WifiSignalHeatmapCard(
                 }
             }
 
+            // Bottom-aligned Input + Button so top/bottom edges align symmetrically
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
                     value = customRoomName,
                     onValueChange = { customRoomName = it },
-                    label = { Text(strings.roomNameInputLabel) },
+                    label = {
+                        Text(
+                            text = strings.roomNameInputLabel,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
                 Button(
                     onClick = { onMeasureRoom(customRoomName) },
                     modifier = Modifier
-                        .height(52.dp)
+                        .height(56.dp)
                         .testTag("measure_room_signal_button"),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(Icons.Default.AddLocationAlt, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(strings.measureRoomBtn)
+                    Text(strings.measureRoomBtn, maxLines = 1)
                 }
             }
 
@@ -431,7 +500,7 @@ private fun WifiSignalHeatmapCard(
                     else -> CrimsonIntrusion
                 }
                 Surface(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
                     shape = RoundedCornerShape(12.dp),
                     border = androidx.compose.foundation.BorderStroke(0.8.dp, heatColor.copy(alpha = 0.45f))
                 ) {
@@ -446,20 +515,31 @@ private fun WifiSignalHeatmapCard(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
+                            ) {
                                 Text(
                                     text = pt.roomName,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = "${pt.frequencyBand} • ${pt.linkSpeedMbps} Mbps • Ping ${pt.latencyMs} ms",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
                                 Surface(
                                     color = heatColor.copy(alpha = 0.16f),
                                     shape = RoundedCornerShape(8.dp)
@@ -518,7 +598,9 @@ private fun VisualTracerouteCard(
     val quickTargets = listOf("1.1.1.1", "8.8.8.8", "cloudflare.com", "google.com")
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(0.8.dp, ElectricCyan.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -530,15 +612,22 @@ private fun VisualTracerouteCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Route,
-                    contentDescription = null,
-                    tint = ElectricCyan,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(ElectricCyan.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Route,
+                        contentDescription = null,
+                        tint = ElectricCyan,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = strings.visualTracerouteHeader,
                         style = MaterialTheme.typography.labelLarge,
@@ -572,25 +661,32 @@ private fun VisualTracerouteCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
                     value = targetHost,
                     onValueChange = onTargetChange,
-                    label = { Text(strings.targetDomainOrIpLabel) },
+                    label = {
+                        Text(
+                            text = strings.targetDomainOrIpLabel,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
                 Button(
                     onClick = onStartTraceroute,
                     enabled = !isRunning,
                     modifier = Modifier
-                        .height(52.dp)
+                        .height(56.dp)
                         .testTag("run_traceroute_button"),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(if (isRunning) strings.tracingRouteBtn else strings.startRouteBtn)
+                    Text(if (isRunning) strings.tracingRouteBtn else strings.startRouteBtn, maxLines = 1)
                 }
             }
 
@@ -604,16 +700,16 @@ private fun VisualTracerouteCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                             RoundedCornerShape(10.dp)
                         )
-                        .padding(10.dp),
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(32.dp)
                             .background(hopColor.copy(alpha = 0.2f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
@@ -624,17 +720,25 @@ private fun VisualTracerouteCard(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 6.dp)
+                    ) {
                         Text(
                             text = "${hop.hostname} (${hop.ipAddress})",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "${hop.asnOrIsp} • TTL ${hop.ttl}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     Surface(
@@ -667,7 +771,9 @@ private fun DnsBenchmarkCard(
     val maxTime = (results.maxOfOrNull { it.responseTimeMs } ?: 40).coerceAtLeast(10)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(0.8.dp, VioletSpectrum.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -679,15 +785,22 @@ private fun DnsBenchmarkCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Dns,
-                    contentDescription = null,
-                    tint = VioletSpectrum,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(VioletSpectrum.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Dns,
+                        contentDescription = null,
+                        tint = VioletSpectrum,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = strings.dnsBenchmarkHeader,
                         style = MaterialTheme.typography.labelLarge,
@@ -703,25 +816,32 @@ private fun DnsBenchmarkCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
                     value = domain,
                     onValueChange = onDomainChange,
-                    label = { Text(strings.queriedDomainLabel) },
+                    label = {
+                        Text(
+                            text = strings.queriedDomainLabel,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
                 Button(
                     onClick = onRunBenchmark,
                     enabled = !isRunning,
                     modifier = Modifier
-                        .height(52.dp)
+                        .height(56.dp)
                         .testTag("run_dns_benchmark_button"),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(strings.runDnsBenchmarkBtn)
+                    Text(strings.runDnsBenchmarkBtn, maxLines = 1)
                 }
             }
 
@@ -729,8 +849,12 @@ private fun DnsBenchmarkCard(
                 val accent = if (item.isFastest) CyberEmerald else ElectricCyan
                 val barRatio = (item.responseTimeMs.toFloat() / maxTime.toFloat()).coerceIn(0.12f, 1f)
                 Surface(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                    shape = RoundedCornerShape(12.dp)
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        0.6.dp,
+                        accent.copy(alpha = if (item.isFastest) 0.5f else 0.25f)
+                    )
                 ) {
                     Column(
                         modifier = Modifier
@@ -745,13 +869,19 @@ private fun DnsBenchmarkCard(
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
                             ) {
                                 Text(
                                     text = "${item.providerName} (${item.primaryIp})",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f, fill = false)
                                 )
                                 if (item.isFastest) {
                                     Surface(
@@ -787,7 +917,9 @@ private fun DnsBenchmarkCard(
                         Text(
                             text = "${item.resolvedIp} • ${item.securityFeatureRo}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -806,7 +938,9 @@ private fun SubnetCalculatorCard(
     var prefixSlider by remember(result.cidrPrefix) { mutableFloatStateOf(result.cidrPrefix.toFloat()) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(0.8.dp, AmberAlert.copy(alpha = 0.35f), RoundedCornerShape(18.dp)),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -818,15 +952,22 @@ private fun SubnetCalculatorCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Calculate,
-                    contentDescription = null,
-                    tint = AmberAlert,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(AmberAlert.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Calculate,
+                        contentDescription = null,
+                        tint = AmberAlert,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = strings.subnetCalculatorHeader,
                         style = MaterialTheme.typography.labelLarge,
@@ -843,7 +984,7 @@ private fun SubnetCalculatorCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
                     value = ipText,
@@ -851,21 +992,34 @@ private fun SubnetCalculatorCard(
                         ipText = it
                         onRecalculate(it, prefixSlider.toInt())
                     },
-                    label = { Text(strings.baseIpv4Label) },
+                    label = {
+                        Text(
+                            text = strings.baseIpv4Label,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
                 Surface(
                     color = AmberAlert.copy(alpha = 0.18f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AmberAlert.copy(alpha = 0.45f)),
+                    modifier = Modifier.height(56.dp)
                 ) {
-                    Text(
-                        text = "/${prefixSlider.toInt()}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = AmberAlert,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-                    )
+                    Box(
+                        modifier = Modifier.padding(horizontal = 18.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "/${prefixSlider.toInt()}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = AmberAlert,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
@@ -884,20 +1038,29 @@ private fun SubnetCalculatorCard(
             )
 
             Surface(
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
-                shape = RoundedCornerShape(12.dp)
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    0.8.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                )
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     SubnetRow(strings.netIdLabel, "${result.networkAddress}/${result.cidrPrefix}")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     SubnetRow(strings.netmaskLabel, result.subnetMask)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     SubnetRow(strings.wildcardMaskLabel, result.wildcardMask)
-                    SubnetRow(strings.usableHostRangeLabel, "${result.firstUsableHost}  →  ${result.lastUsableHost}")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    SubnetRow(strings.usableHostRangeLabel, "${result.firstUsableHost} → ${result.lastUsableHost}")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     SubnetRow(strings.broadcastAddressLabel, result.broadcastAddress)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     SubnetRow(strings.totalUsableHostsLabel, "${result.totalUsableHosts} ${strings.hostsWord}")
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
                     SubnetRow(strings.networkClassLabel, result.networkClassRo)
@@ -911,18 +1074,24 @@ private fun SubnetCalculatorCard(
 private fun SubnetRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .weight(0.46f)
+                .padding(end = 8.dp)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(0.54f)
         )
     }
 }
